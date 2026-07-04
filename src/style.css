@@ -1,0 +1,373 @@
+
+:root{
+  --bg:#030405;
+  --bg2:#080a0d;
+  --panel:#080b10;
+  --panel2:#1b1e23;
+  --border:#3e444d;
+  --metal-light:#c7ccd2;
+  --metal-mid:#5f6772;
+  --gold:#d4a62a;
+  --gold-dark:#8f650e;
+  --gold-soft:#f7c948;
+  --text:#f2f2f2;
+  --muted:#9ea6b2;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+  background:
+    radial-gradient(circle at 25% 0%,rgba(245,197,66,.10),transparent 32%),
+    radial-gradient(circle at 80% 20%,rgba(199,204,210,.08),transparent 36%),
+    linear-gradient(180deg,#020304 0%,var(--bg) 42%,#020304 100%);
+}
+body:before{
+  content:"";
+  position:fixed;inset:0;pointer-events:none;opacity:.12;z-index:-1;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 1px,transparent 1px 4px);
+  mix-blend-mode:screen;
+}
+.app{max-width:980px;margin:auto;padding:20px}
+.splash{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;z-index:9999;animation:fadeIn .7s ease both}
+.splashLogo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:drop-shadow(0 0 28px rgba(221,170,55,.35));animation:logoPulse 5s ease both}
+.loader{
+  position:absolute;left:8%;right:8%;bottom:22px;height:26px;z-index:3;overflow:visible;
+  border-bottom:2px solid rgba(255,202,61,.25);
+  filter:drop-shadow(0 0 10px rgba(255,161,28,.75));
+}
+.loader span{
+  position:absolute;left:0;bottom:8px;height:5px;width:100%;border-radius:999px;
+  background:linear-gradient(90deg,#ff7b00,#ffd644,#fff4a8,#ff8a00);
+  transform-origin:left center;animation:weldTrace 4.7s ease both;
+  box-shadow:0 0 14px rgba(255,202,61,.95),0 0 32px rgba(255,90,0,.45);
+}
+.loader:before{
+  content:"";position:absolute;left:0;bottom:3px;width:34px;height:16px;z-index:4;
+  background:linear-gradient(135deg,#d7d7d7 0%,#7d858f 42%,#1d232b 43%,#07090d 100%);
+  border:1px solid rgba(255,255,255,.42);border-radius:8px 8px 12px 4px;
+  transform:translateX(-10px) rotate(-13deg);animation:torchMove 4.7s ease both;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 0 18px rgba(255,215,90,.75);
+}
+.loader:after{
+  content:"";position:absolute;left:0;bottom:10px;width:11px;height:11px;border-radius:50%;z-index:5;
+  background:#fff7bc;animation:sparkMove 4.7s ease both;
+  box-shadow:
+    0 0 6px #fff, 0 0 14px #ffd340, 0 0 28px #ff6b00,
+    16px -10px 0 -4px #ffd340, 23px 8px 0 -5px #ff7b00,
+    -14px -7px 0 -5px #fff1a8, -24px 6px 0 -6px #ff9b00,
+    8px -21px 0 -6px #fff4aa, 35px -15px 0 -7px #ff7b00;
+}
+.loadingText{display:none}
+
+.designerMark{position:absolute;left:0;right:0;bottom:62px;z-index:3;text-align:center;color:#d4aa47;text-shadow:0 0 12px #000;letter-spacing:2px;line-height:1.1}
+.designerLine{width:150px;height:1px;background:linear-gradient(90deg,transparent,#d4aa47,transparent);margin:7px auto}
+.designerSmall{font-size:12px;font-weight:800;color:#d8d8d8;letter-spacing:3px}
+.designerName{font-size:24px;font-weight:900;color:#ffd35a;letter-spacing:4px;margin-top:3px}
+.top{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:12px 14px;border:1px solid rgba(245,197,66,.34);border-radius:18px;
+  background:linear-gradient(135deg,rgba(95,103,114,.38),rgba(11,13,17,.92) 42%,rgba(245,197,66,.08));
+  box-shadow:0 18px 42px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.12);
+}
+.brand{display:flex;align-items:center;gap:14px}
+.brand img{width:72px;height:72px;object-fit:cover;border-radius:14px;border:1px solid var(--gold);box-shadow:0 0 22px rgba(245,197,66,.26), inset 0 0 12px rgba(255,255,255,.16)}
+.top h1{
+  font-size:38px;margin:0;letter-spacing:.5px;
+  background:linear-gradient(180deg,#fff 0%,var(--metal-light) 42%,#7d858f 58%,#fff 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  text-shadow:0 2px 12px rgba(0,0,0,.55);
+}
+.top button,.actions button{
+  background:linear-gradient(180deg,#ffe982 0%,var(--gold) 42%,var(--gold-dark) 100%);
+  border:1px solid #ffe37a;border-radius:14px;padding:18px 24px;font-weight:900;font-size:22px;color:#111;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 10px 24px rgba(200,144,26,.18);
+}
+.panel{
+  border:1px solid rgba(199,204,210,.18);border-radius:18px;padding:18px;margin:18px 0;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.045),transparent 16%),
+    linear-gradient(180deg,var(--panel2),var(--panel));
+  box-shadow:0 18px 40px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.08);
+}
+.panel h2{color:var(--gold);margin-top:0;letter-spacing:.4px;text-shadow:0 1px 8px rgba(0,0,0,.75)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{font-weight:800;color:var(--text)}
+input,select{
+  width:100%;background:linear-gradient(180deg,#0d1118,#070a0f);color:var(--text);
+  border:1px solid var(--border);border-radius:12px;padding:14px;font-size:22px;margin-top:6px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06), inset 0 -10px 18px rgba(0,0,0,.18);
+}
+input:focus,select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 2px rgba(245,197,66,.18), inset 0 1px 0 rgba(255,255,255,.07)}
+.resultItem{
+  border:1px solid rgba(199,204,210,.18);border-radius:14px;padding:18px;margin:12px 0;
+  background:linear-gradient(180deg,#0e1218,#07090d);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+}
+.resultItem span{display:block;color:var(--muted);font-size:18px}
+.resultItem b{color:var(--gold-soft);font-size:34px;text-shadow:0 0 12px rgba(245,197,66,.16)}
+.drawingBox{
+  background:radial-gradient(circle at 50% 30%,#111821,#040609 70%);border-radius:14px;padding:12px;overflow:hidden;
+  border:1px solid rgba(95,103,114,.35);box-shadow:inset 0 0 38px rgba(0,0,0,.55);
+}
+.profile{fill:none;stroke:#f2f2f2;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 4px rgba(255,255,255,.18))}
+.dim{stroke:var(--metal-light);stroke-width:2}
+.txt,.angle,.bottom{fill:var(--text);font-weight:800;text-anchor:middle}
+.angle{fill:var(--gold)}
+.bottom{fill:var(--gold)}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:22px 0 38px}
+.actions .secondary{background:linear-gradient(180deg,#111821,#06080c);color:var(--gold-soft);border-color:rgba(245,197,66,.62)}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes logoPulse{0%{opacity:0;transform:scale(.94)}35%{opacity:1;transform:scale(1)}100%{opacity:1;transform:scale(1)}}
+@keyframes loadBar{from{transform:translateX(-100%)}to{transform:translateX(0)}}
+@media(max-width:700px){.top h1{font-size:28px}.grid{grid-template-columns:1fr}.app{padding:16px}.brand img{width:58px;height:58px}.top button{padding:14px 18px}}
+.view3dBox{
+  background:radial-gradient(circle at 50% 35%,#1b2631,#05070a 70%);border-radius:14px;padding:10px;overflow:hidden;
+  border:1px solid rgba(95,103,114,.40);box-shadow:inset 0 0 46px rgba(0,0,0,.58),0 12px 30px rgba(0,0,0,.22)
+}
+.iso3d{width:100%;height:auto;display:block}
+.dim3d{stroke:var(--gold-soft);stroke-width:3;stroke-linecap:round;filter:drop-shadow(0 0 3px rgba(245,197,66,.22))}
+.txt3d,.bottom3d{fill:var(--gold-soft);font-weight:900;text-anchor:middle;font-size:24px;text-shadow:0 1px 2px #000}
+.bottom3d{font-size:22px}
+.badge{color:#111;background:linear-gradient(180deg,#ffe982,var(--gold-dark));font-size:14px;margin-left:8px;padding:4px 10px;border-radius:999px;vertical-align:middle;box-shadow:inset 0 1px 0 rgba(255,255,255,.38)}
+
+/* V112 logo metal palette */
+.panel h2{font-size:34px}
+.top{background:linear-gradient(135deg,rgba(210,214,219,.16),rgba(5,6,8,.96) 45%,rgba(212,166,42,.10));}
+.resultItem b{color:var(--gold-soft)}
+
+/* V115 Ayarlar ve otomatik BD sistemi */
+.topButtons{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.topButtons button{font-size:16px;padding:14px 16px}
+.settingsPanel{border-color:rgba(245,197,66,.42)}
+.bdCard{
+  margin-top:16px;padding:16px;border:1px solid rgba(245,197,66,.35);border-radius:16px;
+  background:linear-gradient(135deg,rgba(245,197,66,.12),rgba(7,10,15,.88));
+  display:flex;justify-content:space-between;gap:18px;align-items:center;flex-wrap:wrap
+}
+.bdCard span,.infoStrip span{display:block;color:var(--muted);font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:.6px}
+.bdCard b{display:block;color:var(--gold-soft);font-size:26px;margin:4px 0;text-shadow:0 0 12px rgba(245,197,66,.18)}
+.bdCard small{color:var(--metal-light);font-weight:700}
+.switchLine{display:flex;gap:10px;align-items:center;margin:0;white-space:nowrap;color:var(--gold-soft)}
+.switchLine input{width:22px;height:22px;margin:0;accent-color:var(--gold)}
+.oneLine{margin-top:12px;grid-template-columns:1fr}
+.infoStrip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px}
+.infoStrip div{border:1px solid rgba(199,204,210,.14);border-radius:12px;padding:12px;background:linear-gradient(180deg,#0d1118,#07090d)}
+.infoStrip b{display:block;color:var(--gold-soft);font-size:17px;margin-top:4px}
+@media(max-width:700px){.top{align-items:flex-start;flex-direction:column}.topButtons{width:100%}.topButtons button{flex:1}.infoStrip{grid-template-columns:1fr 1fr}}
+
+/* V118 Profil seçimi */
+.profileChoice{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.profileChoice button{
+  background:linear-gradient(180deg,#111821,#06080c);
+  color:var(--gold-soft);
+  border:1px solid rgba(245,197,66,.45);
+  border-radius:14px;
+  padding:18px 16px;
+  font-size:22px;
+  font-weight:900;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 10px 22px rgba(0,0,0,.22);
+}
+.profileChoice button.active{
+  background:linear-gradient(180deg,#ffe982 0%,var(--gold) 42%,var(--gold-dark) 100%);
+  color:#111;
+  border-color:#ffe37a;
+}
+@media(max-width:700px){.profileChoice{grid-template-columns:1fr}.profileChoice button{font-size:19px}}
+
+/* V120 Köşebent açı motoru */
+.dimSoft{stroke:rgba(199,204,210,.42);stroke-width:1.5;stroke-dasharray:7 7}
+.angleArc{fill:none;stroke:var(--gold-soft);stroke-width:3;stroke-linecap:round;filter:drop-shadow(0 0 3px rgba(245,197,66,.25))}
+
+@keyframes weldTrace{0%{transform:scaleX(0);opacity:.15}8%{opacity:1}92%{opacity:1}100%{transform:scaleX(1);opacity:.9}}
+@keyframes torchMove{0%{left:0;transform:translateX(-10px) rotate(-13deg)}100%{left:100%;transform:translateX(-24px) rotate(-13deg)}}
+@keyframes sparkMove{0%{left:0;opacity:0;transform:translateX(-6px) scale(.8)}8%{opacity:1}50%{transform:translateX(-4px) scale(1.08)}92%{opacity:1}100%{left:100%;opacity:0;transform:translateX(-10px) scale(.8)}}
+
+
+/* V123 MIG/MAG kaynak torcu splash animasyonu */
+.loader{display:none}
+.splash:after{
+  content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:radial-gradient(circle at 50% 80%,rgba(0,140,255,.10),transparent 22%),radial-gradient(circle at 48% 86%,rgba(255,120,0,.18),transparent 18%);
+  animation:weldFlash 3.2s ease both;
+}
+.weldStage{
+  position:absolute;left:7%;right:7%;bottom:28px;height:94px;z-index:5;overflow:visible;
+  filter:drop-shadow(0 0 10px rgba(0,180,255,.22));
+}
+.weldRail{
+  position:absolute;left:0;right:0;bottom:30px;height:10px;border-radius:999px;
+  background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02));
+  border-top:1px solid rgba(255,255,255,.18);
+  box-shadow:inset 0 -2px 8px rgba(0,0,0,.8),0 0 18px rgba(0,0,0,.75);
+}
+.weldSeam{
+  position:absolute;left:0;bottom:1px;height:8px;width:100%;border-radius:999px;
+  transform-origin:left center;transform:scaleX(0);animation:v123Seam 3.05s cubic-bezier(.22,.75,.16,1) both;
+  background:linear-gradient(90deg,#6e2200 0%,#ff6400 22%,#ffcf35 52%,#fff8bd 74%,#ff7b00 100%);
+  box-shadow:0 0 9px #ffb000,0 0 24px rgba(255,100,0,.85),0 0 44px rgba(0,174,255,.22);
+}
+.migTorch{
+  position:absolute;left:0;bottom:39px;width:112px;height:56px;z-index:8;
+  transform:translateX(-58px);animation:v123Torch 3.05s cubic-bezier(.22,.75,.16,1) both;
+}
+.torchCable{
+  position:absolute;left:-48px;top:6px;width:80px;height:28px;border-top:7px solid #1a1d22;border-radius:50%;transform:rotate(-7deg);filter:drop-shadow(0 1px 2px #000);
+}
+.torchBody{
+  position:absolute;left:22px;top:2px;width:70px;height:25px;border-radius:12px 16px 8px 12px;
+  background:linear-gradient(135deg,#e8edf0 0%,#8e98a3 28%,#232a31 54%,#07090c 100%);
+  border:1px solid rgba(255,255,255,.38);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.45),0 4px 10px rgba(0,0,0,.6);
+  transform:rotate(-16deg);
+}
+.torchBody:after{
+  content:"";position:absolute;left:22px;top:19px;width:28px;height:18px;border-radius:4px 4px 10px 10px;
+  background:linear-gradient(180deg,#343b43,#080a0d);border:1px solid rgba(255,255,255,.16);transform:rotate(9deg);
+}
+.torchNozzle{
+  position:absolute;left:78px;top:24px;width:38px;height:12px;border-radius:3px 12px 12px 3px;
+  background:linear-gradient(90deg,#242a31,#f0f1ed 42%,#8a5b23 72%,#25140a);
+  border:1px solid rgba(255,222,120,.38);transform:rotate(18deg);transform-origin:left center;
+  box-shadow:0 0 8px rgba(255,210,90,.3);
+}
+.blueArc{
+  position:absolute;left:108px;top:38px;width:18px;height:18px;border-radius:50%;
+  background:radial-gradient(circle,#fff 0 16%,#b9f3ff 17% 34%,#00a6ff 35% 58%,rgba(0,166,255,0) 70%);
+  animation:v123Arc 0.09s infinite alternate;filter:blur(.2px);
+  box-shadow:0 0 10px #fff,0 0 26px #00a6ff,0 0 48px rgba(0,166,255,.65),0 0 70px rgba(255,108,0,.35);
+}
+.sp{
+  position:absolute;left:0;bottom:42px;width:5px;height:5px;border-radius:50%;z-index:7;
+  background:#ffd95d;box-shadow:0 0 8px #fff,0 0 16px #ff7b00;
+  opacity:0;animation:v123Spark 3.05s linear both;
+}
+.s1{--dy:-36px;--dx:46px;animation-delay:.05s}.s2{--dy:-18px;--dx:68px;animation-delay:.12s}.s3{--dy:22px;--dx:54px;animation-delay:.18s}.s4{--dy:-52px;--dx:84px;animation-delay:.28s}.s5{--dy:36px;--dx:72px;animation-delay:.36s}
+.s6{--dy:-28px;--dx:112px;animation-delay:.48s}.s7{--dy:18px;--dx:102px;animation-delay:.62s}.s8{--dy:-62px;--dx:132px;animation-delay:.78s}.s9{--dy:44px;--dx:118px;animation-delay:.96s}.s10{--dy:-10px;--dx:152px;animation-delay:1.14s}
+.smoke{
+  position:absolute;left:0;bottom:52px;width:36px;height:36px;border-radius:50%;z-index:6;
+  background:radial-gradient(circle,rgba(180,190,195,.26),rgba(180,190,195,0) 70%);
+  opacity:0;filter:blur(5px);animation:v123Smoke 3.05s ease-out both;
+}
+.smoke2{animation-delay:.75s;width:44px;height:44px}
+@keyframes v123Seam{0%{transform:scaleX(0);opacity:.2}10%{opacity:1}95%{opacity:1}100%{transform:scaleX(1);opacity:1}}
+@keyframes v123Torch{0%{transform:translateX(-58px)}100%{transform:translateX(calc(100vw - 23vw))}}
+@keyframes v123Arc{from{transform:scale(.78);opacity:.75}to{transform:scale(1.28);opacity:1}}
+@keyframes v123Spark{
+  0%,7%{opacity:0;transform:translateX(0) translateY(0) scale(.5)}
+  10%{opacity:1;transform:translateX(var(--dx)) translateY(var(--dy)) scale(1)}
+  18%{opacity:0;transform:translateX(calc(var(--dx) * 1.35)) translateY(calc(var(--dy) * 1.35 + 22px)) scale(.25)}
+  100%{opacity:0}
+}
+@keyframes v123Smoke{
+  0%,20%{opacity:0;transform:translateX(0) translateY(0) scale(.4)}
+  32%{opacity:.5;transform:translateX(24vw) translateY(-12px) scale(1)}
+  72%{opacity:.16;transform:translateX(62vw) translateY(-42px) scale(1.8)}
+  100%{opacity:0;transform:translateX(80vw) translateY(-58px) scale(2.2)}
+}
+@keyframes weldFlash{0%,100%{opacity:.75}8%,18%,42%,68%{opacity:1}12%,28%,56%{opacity:.55}}
+@media(max-width:700px){
+  .weldStage{left:6%;right:6%;bottom:20px;height:84px}.migTorch{width:92px;transform:translateX(-50px)}
+  .torchBody{width:56px;height:22px}.torchNozzle{left:64px}.blueArc{left:92px}
+  @keyframes v123Torch{0%{transform:translateX(-50px)}100%{transform:translateX(calc(100vw - 28vw))}}
+}
+
+
+/* V124 METALLIC GREY - altın kaldırıldı, sadece gri metal tonları */
+:root{
+  --bg:#0b0d10;
+  --bg2:#14181d;
+  --panel:#15191f;
+  --panel2:#252b32;
+  --border:#59616b;
+  --metal-light:#d4d9de;
+  --metal-mid:#87919b;
+  --gold:#9aa3ad;
+  --gold-dark:#5c6670;
+  --gold-soft:#cfd5da;
+  --text:#f2f4f6;
+  --muted:#aab2ba;
+}
+body{
+  background:
+    radial-gradient(circle at 25% 0%,rgba(210,217,224,.08),transparent 32%),
+    radial-gradient(circle at 80% 20%,rgba(154,163,173,.08),transparent 36%),
+    linear-gradient(180deg,#060708 0%,#12161b 45%,#050607 100%) !important;
+}
+.splashClean{
+  background:#000 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+.splashLogoClean{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+  filter:none !important;
+  animation:none !important;
+}
+.designerMark,.weldStage,.loader,.splash:after,.migTorch,.weldRail,.weldSeam,.sp,.smoke{display:none!important}
+.top{
+  border:1px solid rgba(205,213,220,.28) !important;
+  background:linear-gradient(135deg,rgba(214,220,226,.16),rgba(19,23,28,.96) 44%,rgba(111,121,132,.12)) !important;
+  box-shadow:0 18px 42px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.12) !important;
+}
+.brand img{
+  border:1px solid rgba(207,213,218,.55) !important;
+  box-shadow:0 0 20px rgba(190,198,207,.16), inset 0 0 12px rgba(255,255,255,.12) !important;
+}
+.top button,.actions button{
+  background:linear-gradient(180deg,#d7dde2 0%,#98a2ac 42%,#4f5862 100%) !important;
+  border:1px solid #d3d9df !important;
+  color:#080a0d !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.62),0 10px 24px rgba(0,0,0,.25) !important;
+}
+.actions .secondary,.profileChoice button{
+  background:linear-gradient(180deg,#2b323a,#11161c) !important;
+  color:#d8dde2 !important;
+  border-color:rgba(205,213,220,.38) !important;
+}
+.profileChoice button.active{
+  background:linear-gradient(180deg,#d7dde2 0%,#98a2ac 42%,#4f5862 100%) !important;
+  color:#07090c !important;
+  border-color:#d4d9de !important;
+}
+.panel{
+  border:1px solid rgba(205,213,220,.20) !important;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.055),transparent 18%),
+    linear-gradient(180deg,#2b3138,#11161c) !important;
+}
+.panel h2{color:#d4d9de !important;text-shadow:0 1px 8px rgba(0,0,0,.75) !important}
+input,select{
+  background:linear-gradient(180deg,#171c22,#080b0f) !important;
+  border:1px solid #59616b !important;
+}
+input:focus,select:focus{
+  border-color:#cfd5da !important;
+  box-shadow:0 0 0 2px rgba(207,213,218,.16), inset 0 1px 0 rgba(255,255,255,.07) !important;
+}
+.resultItem b,.bdCard b,.infoStrip b,.switchLine{
+  color:#e4e8eb !important;
+  text-shadow:0 0 10px rgba(207,213,218,.12) !important;
+}
+.bdCard{
+  border:1px solid rgba(205,213,220,.28) !important;
+  background:linear-gradient(135deg,rgba(205,213,220,.10),rgba(7,10,15,.88)) !important;
+}
+.switchLine input{accent-color:#cfd5da !important}
+.drawingBox,.view3dBox{
+  background:radial-gradient(circle at 50% 30%,#19212a,#040609 72%) !important;
+  border:1px solid rgba(135,145,155,.40) !important;
+}
+.profile{stroke:#f2f4f6 !important}
+.dim,.dim3d{stroke:#cfd5da !important;filter:drop-shadow(0 0 3px rgba(207,213,218,.18)) !important}
+.txt,.txt3d,.bottom,.bottom3d,.angle{fill:#f2f4f6 !important}
+.angleArc{stroke:#cfd5da !important;filter:drop-shadow(0 0 3px rgba(207,213,218,.2)) !important}
+.badge{
+  background:linear-gradient(180deg,#d7dde2,#5b646e) !important;
+  color:#080a0d !important;
+}

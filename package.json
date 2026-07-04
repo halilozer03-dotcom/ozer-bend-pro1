@@ -1,0 +1,27 @@
+{
+  "name": "ozer-bend-pro-master",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "start": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0"
+  },
+  "dependencies": {
+    "@capacitor/android": "7.4.3",
+    "@capacitor/core": "7.4.3",
+    "@capacitor/filesystem": "7.1.4",
+    "@capacitor/share": "7.0.2",
+    "@capacitor-community/file-opener": "latest",
+    "@vitejs/plugin-react": "latest",
+    "vite": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "jspdf": "latest"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "7.4.3"
+  }
+}
