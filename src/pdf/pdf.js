@@ -82,8 +82,6 @@ async function outputPdf(doc, fileName, action = "save") {
           return;
         } catch (openErr) {
           console.warn("FileOpener kullanılamadı, paylaşım penceresine düşülüyor:", openErr);
-          // file-opener eklentisi kurulu/derlenmiş değilse, en azından
-          // dosyayı görebileceği bir yola (Share) düş.
         }
       }
 
@@ -212,8 +210,6 @@ export async function createPdf({ data, result, lang, action = "save" }) {
   const saat = new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
   const fileName = makeFileName(data);
 
-  // Kapı profilinde PDF üzerinde istenen üretim okuması:
-  // A = sol yatay ayak, B = sol dik kanat, C = sağ dik kanat, D = sağ yatay ayak.
   const A = rawA;
   const B = isLProfile ? rawB : rawC;
   const C = isLProfile ? rawC : rawD;
@@ -225,7 +221,6 @@ export async function createPdf({ data, result, lang, action = "save" }) {
   doc.setLineWidth(0.45);
   doc.rect(3, 3, 291, 204);
 
-  // Logo ve başlık.
   doc.setFont("helvetica", "bold");
   doc.setFontSize(25);
   doc.setTextColor(0, 0, 0);
@@ -242,7 +237,6 @@ export async function createPdf({ data, result, lang, action = "save" }) {
   doc.setLineWidth(0.25);
   doc.line(6, 29, 291, 29);
 
-  // Sade üst bilgi satırı.
   const info = [
     ["PROFİL", isLProfile ? "KÖŞEBENT L" : "KAPI PROFİLİ", 42],
     ["MALZEME", material, 32],
@@ -262,7 +256,6 @@ export async function createPdf({ data, result, lang, action = "save" }) {
   doc.line(6, 50, 291, 50);
 
   if (isLProfile) {
-    // L profil için sade çizim korunur.
     const cx = 105, cy = 140;
     const lenA = 70;
     const lenB = 55;
@@ -278,7 +271,6 @@ export async function createPdf({ data, result, lang, action = "save" }) {
     doc.setFontSize(11);
     doc.text(`${angle}°`, cx + 8, cy - 9);
   } else {
-    // Ana kapı profil çizimi.
     const x1 = 55;
     const x2 = 242;
     const yTop = 86;
@@ -295,14 +287,12 @@ export async function createPdf({ data, result, lang, action = "save" }) {
     doc.line(x1, yBot, x1 + foot, yBot);
     doc.line(x2 - foot, yBot, x2, yBot);
 
-    // Ölçüler: sadece gerekli olanlar. B ve C dik kanatların yanında.
     dimH(doc, x1, x2, yTop - 14, fmt(EN));
     dimV(doc, x1 - 24, yTop, yBot, fmt(B), "B", "left", red);
     dimV(doc, x2 + 24, yTop, yBot, fmt(C), "C", "right", red);
     dimH(doc, x1, x1 + foot, yBot + 14, fmt(A), "A", red);
     dimH(doc, x2 - foot, x2, yBot + 14, fmt(D), "D", red);
 
-    // Sadece sol üst 90 derece işareti.
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.28);
     doc.arc(x1, yTop, 20, 20, 0, 90);
@@ -312,7 +302,6 @@ export async function createPdf({ data, result, lang, action = "save" }) {
     doc.text("90°", x1 + 12, yTop + 12);
   }
 
-  // Alt özet satırı.
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.35);
   doc.rect(6, 174, 285, 31);
