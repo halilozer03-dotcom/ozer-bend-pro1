@@ -73,8 +73,6 @@ async function outputPdf(doc, fileName, action = "save") {
         recursive: true
       });
 
-      // "save" (PDF) ve "print" (YAZDIR) butonları: dosyayı gerçekten AÇ
-      // (sistemin varsayılan PDF görüntüleyicisiyle), paylaşım ekranı değil.
       if (action === "save" || action === "print") {
         try {
           const { FileOpener } = await import("@capacitor-community/file-opener");
@@ -85,7 +83,6 @@ async function outputPdf(doc, fileName, action = "save") {
         }
       }
 
-      // "share" (PAYLAŞ) butonu: gerçek native paylaşım penceresi.
       await Share.share({
         title: "ÖZER BEND PRO PDF",
         text: "ÖZER BEND PRO teknik çizim PDF",
@@ -187,7 +184,16 @@ function drawInfoCell(doc, x, w, title, value) {
   doc.text(value, x + w / 2, 45, { align: "center" });
 }
 
-export async function createPdf({ data, result, lang, action = "save" }) {
+export async function createPdf(args) {
+  try {
+    await createPdfInner(args);
+  } catch (err) {
+    console.error("PDF oluşturma hatası:", err);
+    alert("PDF oluşturulurken hata oluştu: " + (err?.message || err));
+  }
+}
+
+async function createPdfInner({ data, result, lang, action = "save" }) {
   const doc = new jsPDF("landscape", "mm", "a4");
   const red = [210, 0, 0];
   const ink = [0, 0, 0];
@@ -295,7 +301,8 @@ export async function createPdf({ data, result, lang, action = "save" }) {
 
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.28);
-    doc.arc(x1, yTop, 20, 20, 0, 90);
+    doc.line(x1 + 8, yTop, x1 + 8, yTop + 8);
+    doc.line(x1, yTop + 8, x1 + 8, yTop + 8);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9.5);
     doc.setTextColor(0, 0, 0);
