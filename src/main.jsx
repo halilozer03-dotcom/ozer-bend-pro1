@@ -728,66 +728,6 @@ const DICT = {
     toplamUzunluk: "总切割长度",
     bukumSayisi: "弯曲次数",
     segment: "段"
-  },
-  ar: {
-    app: "OZER BEND PRO V126",
-    dims: "Al abaad",
-    profile: "Al malaf",
-    settings: "Al eedadat",
-    results: "Nataej al qas",
-    cw: "Ard al qas",
-    ch: "Tool al qas",
-    draw: "2D",
-    pdf: "PDF",
-    print: "Tebaa",
-    share: "Mosharaka",
-    loading: "Jari al bad...",
-    view3d: "3D",
-    machineLabel: "Al makina",
-    lowerDieLabel: "Al qaleb al sofli",
-    upperDieLabel: "Al mekbas al olwi",
-    materialLabel: "Al madda",
-    thicknessLabel: "Somk al saf iha",
-    insideRLabel: "Nesf al qotr al dakheli",
-    angleLabel: "Zawiyat al thani",
-    deductLabel: "Khasm 15 mm",
-    bdAutoLabel: "BD telqaii",
-    bdUnit: "mm / thanya",
-    manualBdToggle: "BD yadawi",
-    manualBdInputLabel: "BD yadawi mm / thanya",
-    hardoxWarning: "Qimat BD al telqaiya le maddat Hardox hiya taqdeer ghayr moakkad. La tabda al entaj bidoon thanya ekhtebar haqiqiya.",
-    feedbackBtn: "Ersal molahazat",
-    feedbackSubjectManual: "OZER BEND PRO - Molahazat",
-    feedbackGreeting: "Marhaban,\n\nMolahazati/moshkelati hawla al tatbiq:\n\n",
-    autoErrorSubject: "OZER BEND PRO - Taqreer khata telqaii",
-    autoErrorPrefix: "Hadatha khata ghayr motawaqqa fi al tatbiq:\n",
-    autoErrorSuffix: "\n\nHal tureed al eblagh an hatha al khata lel motawwer an tareeq al bareed al elektroni?",
-    unknownError: "Khata ghayr maroof",
-    unknownPromiseError: "Khata promise ghayr maroof",
-    lockedBadge: "V114 moqfal",
-    cornerSingleBend: "Zawiya (L) - thanya wahida",
-    lengthWord: "Al tool",
-    leftWord: "Yasar",
-    rightWord: "Yameen",
-    bottomLeftWord: "Asfal yasar",
-    bottomRightWord: "Asfal yameen",
-    genelProfil: "Malaf aam",
-    segmentUzunluk: "Al tool",
-    segmentAci: "Al zawiya",
-    segmentYon: "Al ittijah",
-    yonYukari: "Aala",
-    yonAsagi: "Asfal",
-    segmentEkle: "+ Edafat qeta",
-    segmentSil: "Ezala",
-    favorites: "Al mofaddala",
-    favSave: "Hefz",
-    favLoad: "Tahmeel",
-    favDelete: "Hazf",
-    favEmpty: "La tojad mofaddalat mahfoza.",
-    favNamePrompt: "Esm al mofaddala:",
-    toplamUzunluk: "Ejmali tool al qas",
-    bukumSayisi: "Adad al thanayat",
-    segment: "Qeta"
   }
 };
 
@@ -801,8 +741,7 @@ const LANGUAGES = [
   { code: "ru", flag: "🇷🇺", label: "Русский" },
   { code: "pt", flag: "🇵🇹", label: "Português" },
   { code: "pl", flag: "🇵🇱", label: "Polski" },
-  { code: "zh", flag: "🇨🇳", label: "中文" },
-  { code: "ar", flag: "🇩🇿", label: "Cezayir" }
+  { code: "zh", flag: "🇨🇳", label: "中文" }
 ];
 
 function App() {
@@ -1218,7 +1157,7 @@ function App() {
   const currentLangInfo = LANGUAGES.find((l) => l.code === lang) || LANGUAGES[0];
 
   return (
-    <main className="app" dir={lang === "ar" ? "rtl" : "ltr"}>
+    <main className="app">
       <header className="top">
         <div className="brand">
           <img src={logoUrl} alt="ÖZER BEND PRO" />
