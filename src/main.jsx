@@ -801,7 +801,8 @@ const LANGUAGES = [
   { code: "ru", flag: "🇷🇺", label: "Русский" },
   { code: "pt", flag: "🇵🇹", label: "Português" },
   { code: "pl", flag: "🇵🇱", label: "Polski" },
-  { code: "zh", flag: "🇨🇳", label: "中文" }
+  { code: "zh", flag: "🇨🇳", label: "中文" },
+  { code: "ar", flag: "🇸🇦", label: "Arabic" }
 ];
 
 function App() {
