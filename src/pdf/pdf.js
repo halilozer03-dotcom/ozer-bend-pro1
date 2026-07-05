@@ -91,8 +91,14 @@ async function outputPdf(doc, fileName, action = "save") {
       });
       return;
     } catch (err) {
-      console.error("Android PDF output error:", err);
-      alert("PDF işleminde hata oluştu: " + (err?.message || err));
+      const msg = String(err?.message || err || "");
+      const isCancel = /cancel/i.test(msg) || /iptal/i.test(msg);
+      if (!isCancel) {
+        console.error("Android PDF output error:", err);
+        alert("PDF işleminde hata oluştu: " + msg);
+      } else {
+        console.log("PDF işlemi kullanıcı tarafından iptal edildi.");
+      }
       return;
     }
   }
@@ -188,8 +194,12 @@ export async function createPdf(args) {
   try {
     await createPdfInner(args);
   } catch (err) {
-    console.error("PDF oluşturma hatası:", err);
-    alert("PDF oluşturulurken hata oluştu: " + (err?.message || err));
+    const msg = String(err?.message || err || "");
+    const isCancel = /cancel/i.test(msg) || /iptal/i.test(msg);
+    if (!isCancel) {
+      console.error("PDF oluşturma hatası:", err);
+      alert("PDF oluşturulurken hata oluştu: " + msg);
+    }
   }
 }
 
