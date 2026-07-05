@@ -148,7 +148,7 @@ function scalePointsToBox(pts, vbW, vbH, pad) {
 
 const DICT = {
   tr: {
-    app: "ÖZER BEND PRO V126",
+    app: "ÖZER BEND PRO V127",
     dims: "ÖLÇÜLER",
     profile: "PROFİL",
     settings: "AYARLAR",
@@ -208,7 +208,7 @@ const DICT = {
     segment: "Segment"
   },
   en: {
-    app: "ÖZER BEND PRO V126",
+    app: "ÖZER BEND PRO V127",
     dims: "DIMENSIONS",
     profile: "PROFILE",
     settings: "SETTINGS",
@@ -268,7 +268,7 @@ const DICT = {
     segment: "Segment"
   },
   fr: {
-    app: "ÖZER BEND PRO V126",
+    app: "ÖZER BEND PRO V127",
     dims: "DIMENSIONS",
     profile: "PROFIL",
     settings: "RÉGLAGES",
@@ -328,7 +328,7 @@ const DICT = {
     segment: "Segment"
   },
   de: {
-    app: "ÖZER BEND PRO V126",
+    app: "ÖZER BEND PRO V127",
     dims: "ABMESSUNGEN",
     profile: "PROFIL",
     settings: "EINSTELLUNGEN",
@@ -388,7 +388,7 @@ const DICT = {
     segment: "Segment"
   },
   es: {
-    app: "ÖZER BEND PRO V126",
+    app: "ÖZER BEND PRO V127",
     dims: "DIMENSIONES",
     profile: "PERFIL",
     settings: "AJUSTES",
@@ -448,7 +448,7 @@ const DICT = {
     segment: "Segmento"
   },
   it: {
-    app: "ÖZER BEND PRO V126",
+    app: "ÖZER BEND PRO V127",
     dims: "DIMENSIONI",
     profile: "PROFILO",
     settings: "IMPOSTAZIONI",
@@ -508,7 +508,7 @@ const DICT = {
     segment: "Segmento"
   },
   ru: {
-    app: "ÖZER BEND PRO V126",
+    app: "ÖZER BEND PRO V127",
     dims: "РАЗМЕРЫ",
     profile: "ПРОФИЛЬ",
     settings: "НАСТРОЙКИ",
@@ -568,7 +568,7 @@ const DICT = {
     segment: "Сегмент"
   },
   pt: {
-    app: "ÖZER BEND PRO V126",
+    app: "ÖZER BEND PRO V127",
     dims: "DIMENSÕES",
     profile: "PERFIL",
     settings: "CONFIGURAÇÕES",
@@ -628,7 +628,7 @@ const DICT = {
     segment: "Segmento"
   },
   pl: {
-    app: "ÖZER BEND PRO V126",
+    app: "ÖZER BEND PRO V127",
     dims: "WYMIARY",
     profile: "PROFIL",
     settings: "USTAWIENIA",
@@ -688,7 +688,7 @@ const DICT = {
     segment: "Segment"
   },
   zh: {
-    app: "ÖZER BEND PRO V126",
+    app: "ÖZER BEND PRO V127",
     dims: "尺寸",
     profile: "型材",
     settings: "设置",
@@ -748,7 +748,7 @@ const DICT = {
     segment: "段"
   },
   ar: {
-    app: "ÖZER BEND PRO V126",
+    app: "ÖZER BEND PRO V127",
     dims: "الأبعاد",
     profile: "الملف",
     settings: "الإعدادات",
