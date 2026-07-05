@@ -118,6 +118,48 @@ input:focus,select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 
 .bottom{fill:var(--gold)}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:22px 0 38px}
 .actionsSingle{grid-template-columns:1fr;margin-top:-18px}
+
+.segmentEditor{display:flex;flex-direction:column;gap:14px}
+.segmentRow{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:flex-end;
+  gap:10px;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:10px;
+  padding:10px;
+}
+.segmentIndex{
+  flex:0 0 100%;
+  font-weight:800;
+  color:var(--gold-soft, #f5c542);
+  font-size:13px;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+.segmentRow label{flex:1 1 90px;min-width:80px}
+.dirBtn{
+  padding:10px 14px;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,.15);
+  background:#1a2028;
+  color:#f2f4f6;
+  font-weight:700;
+  white-space:nowrap;
+}
+.dirBtn.dirDown{background:rgba(90,140,255,.15);border-color:rgba(90,140,255,.4)}
+.dirBtn.dirUp{background:rgba(245,197,66,.12);border-color:rgba(245,197,66,.4)}
+.segmentButtons{display:flex;gap:10px}
+.segmentButtons button{
+  flex:1;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.15);
+  background:#1a2028;
+  color:#f2f4f6;
+  font-weight:800;
+}
 .actions .secondary{background:linear-gradient(180deg,#111821,#06080c);color:var(--gold-soft);border-color:rgba(245,197,66,.62)}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes logoPulse{0%{opacity:0;transform:scale(.94)}35%{opacity:1;transform:scale(1)}100%{opacity:1;transform:scale(1)}}

@@ -53,7 +53,8 @@ const materials = ["DKP", "Galvaniz", "INOX 304", "INOX 316", "Alüminyum 1050",
 const thicknesses = [0.8, 1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6];
 const profileTypes = [
   { value: "kapi", labelTr: "Kapı Profili", labelFr: "Profil porte", labelEn: "Door Profile", labelDe: "Türprofil" },
-  { value: "l", labelTr: "Köşebent (L)", labelFr: "Cornière (L)", labelEn: "Corner (L)", labelDe: "Winkel (L)" }
+  { value: "l", labelTr: "Köşebent (L)", labelFr: "Cornière (L)", labelEn: "Corner (L)", labelDe: "Winkel (L)" },
+  { value: "genel", labelTr: "Genel Profil", labelFr: "Profil général", labelEn: "General Profile", labelDe: "Allgemeines Profil" }
 ];
 
 function materialLabel(code, lang) {
@@ -86,6 +87,38 @@ function autoBdValue({ material, thickness, lowerDie, upperDie }) {
   const matFactor = material === "Hardox" ? 1.18 : material.includes("INOX") ? 1.10 : material.includes("Alüminyum") ? 0.92 : material === "Galvaniz" ? 1.02 : 1.00;
   const vFactor = lowerDie.includes("V12") ? 1.05 : lowerDie.includes("V16") ? 1.65 : lowerDie.includes("V22") ? 1.85 : lowerDie.includes("V35") ? 2.10 : lowerDie.includes("V50") ? 2.35 : 2.65;
   return Number((t * vFactor * matFactor).toFixed(2));
+}
+
+// Genel profil (N segment): her segment bir uzunluk, aralarındaki her eklemde
+// bir büküm açısı ve yönü (yukarı/aşağı) var. Segment sayısı sınırsız.
+function computeGeneralPoints(segments) {
+  const pts = [{ x: 0, y: 0 }];
+  let heading = 0;
+  for (let i = 0; i < segments.length; i++) {
+    const len = Number(segments[i].length) || 0;
+    const rad = (heading * Math.PI) / 180;
+    const prev = pts[pts.length - 1];
+    pts.push({ x: prev.x + Math.cos(rad) * len, y: prev.y + Math.sin(rad) * len });
+    if (i < segments.length - 1) {
+      const ang = Number(segments[i].angle) || 90;
+      const dir = segments[i].dir === -1 ? -1 : 1;
+      heading += dir * (180 - ang);
+    }
+  }
+  return pts;
+}
+
+function scalePointsToBox(pts, vbW, vbH, pad) {
+  const xs = pts.map((p) => p.x);
+  const ys = pts.map((p) => p.y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  const minY = Math.min(...ys), maxY = Math.max(...ys);
+  const w = Math.max(1, maxX - minX);
+  const h = Math.max(1, maxY - minY);
+  const scale = Math.min((vbW - pad * 2) / w, (vbH - pad * 2) / h, 10);
+  const offX = (vbW - w * scale) / 2 - minX * scale;
+  const offY = (vbH - h * scale) / 2 - minY * scale;
+  return pts.map((p) => ({ x: p.x * scale + offX, y: p.y * scale + offY }));
 }
 
 const DICT = {
@@ -130,7 +163,18 @@ const DICT = {
     leftWord: "Sol",
     rightWord: "Sağ",
     bottomLeftWord: "Sol Alt",
-    bottomRightWord: "Sağ Alt"
+    bottomRightWord: "Sağ Alt",
+    genelProfil: "GENEL PROFİL",
+    segmentUzunluk: "Uzunluk",
+    segmentAci: "Açı",
+    segmentYon: "Yön",
+    yonYukari: "Yukarı",
+    yonAsagi: "Aşağı",
+    segmentEkle: "+ Segment Ekle",
+    segmentSil: "Kaldır",
+    toplamUzunluk: "Toplam Kesilecek Uzunluk",
+    bukumSayisi: "Büküm Sayısı",
+    segment: "Segment"
   },
   en: {
     app: "ÖZER BEND PRO V126",
@@ -173,7 +217,18 @@ const DICT = {
     leftWord: "Left",
     rightWord: "Right",
     bottomLeftWord: "Bottom Left",
-    bottomRightWord: "Bottom Right"
+    bottomRightWord: "Bottom Right",
+    genelProfil: "GENERAL PROFILE",
+    segmentUzunluk: "Length",
+    segmentAci: "Angle",
+    segmentYon: "Direction",
+    yonYukari: "Up",
+    yonAsagi: "Down",
+    segmentEkle: "+ Add Segment",
+    segmentSil: "Remove",
+    toplamUzunluk: "Total Cut Length",
+    bukumSayisi: "Bend Count",
+    segment: "Segment"
   },
   fr: {
     app: "ÖZER BEND PRO V126",
@@ -216,7 +271,18 @@ const DICT = {
     leftWord: "Gauche",
     rightWord: "Droite",
     bottomLeftWord: "Bas Gauche",
-    bottomRightWord: "Bas Droite"
+    bottomRightWord: "Bas Droite",
+    genelProfil: "PROFIL GÉNÉRAL",
+    segmentUzunluk: "Longueur",
+    segmentAci: "Angle",
+    segmentYon: "Direction",
+    yonYukari: "Haut",
+    yonAsagi: "Bas",
+    segmentEkle: "+ Ajouter un segment",
+    segmentSil: "Retirer",
+    toplamUzunluk: "Longueur totale de coupe",
+    bukumSayisi: "Nombre de plis",
+    segment: "Segment"
   },
   de: {
     app: "ÖZER BEND PRO V126",
@@ -259,7 +325,18 @@ const DICT = {
     leftWord: "Links",
     rightWord: "Rechts",
     bottomLeftWord: "Unten Links",
-    bottomRightWord: "Unten Rechts"
+    bottomRightWord: "Unten Rechts",
+    genelProfil: "ALLGEMEINES PROFIL",
+    segmentUzunluk: "Länge",
+    segmentAci: "Winkel",
+    segmentYon: "Richtung",
+    yonYukari: "Oben",
+    yonAsagi: "Unten",
+    segmentEkle: "+ Segment hinzufügen",
+    segmentSil: "Entfernen",
+    toplamUzunluk: "Gesamte Schnittlänge",
+    bukumSayisi: "Anzahl der Biegungen",
+    segment: "Segment"
   }
 };
 
@@ -285,6 +362,12 @@ function App() {
   const [D, setD] = useState(40);
   const [EN, setEN] = useState(1000);
   const [H, setH] = useState(2000);
+
+  const [segments, setSegments] = useState([
+    { length: 100, angle: 90, dir: 1 },
+    { length: 100, angle: 90, dir: 1 },
+    { length: 100 }
+  ]);
 
   const [machine, setMachine] = useState("DURMA Easy");
   const [lowerDie, setLowerDie] = useState("M.460.R/F V16");
@@ -352,14 +435,42 @@ function App() {
   const bd = manualBd ? Number(manualBdValue) || 0 : computedBd;
 
   const isLProfile = profileType === "l";
-  const bendCount = isLProfile ? 1 : 4;
-  const total = isLProfile ? A + B : A + B + C + D + EN;
+  const isGeneral = profileType === "genel";
+  const isKapi = profileType === "kapi";
+  const bendCount = isLProfile ? 1 : isGeneral ? Math.max(0, segments.length - 1) : 4;
+  const total = isLProfile ? A + B : isGeneral ? segments.reduce((s, seg) => s + (Number(seg.length) || 0), 0) : A + B + C + D + EN;
   const bdToplam = bd * bendCount;
-  // Kapı profilinde mevcut 15 mm düşüm korunur. Köşebent tek bükümde düşüm uygulanmaz.
-  const kesilecekEn = isLProfile ? total - bdToplam : total - bdToplam - deduct;
-  const kesilecekBoy = isLProfile ? null : H - deduct;
-  const data = { profileType, A, B, C, D, EN, H, bd, deduct, material, kalip: lowerDie, upperDie, machine, thickness, aci: bendAngle, icR: insideR, bendCount };
+  // Kapı profilinde mevcut 15 mm düşüm korunur. Köşebent ve genel profilde
+  // ekstra düşüm uygulanmaz, sadece büküm başına BD çıkarılır.
+  const kesilecekEn = isKapi ? total - bdToplam - deduct : total - bdToplam;
+  const kesilecekBoy = isKapi ? H - deduct : null;
+  const data = { profileType, A, B, C, D, EN, H, bd, deduct, material, kalip: lowerDie, upperDie, machine, thickness, aci: bendAngle, icR: insideR, bendCount, segments: isGeneral ? segments : undefined };
   const result = { kesilecekEn, kesilecekBoy, bdToplam };
+
+  const addSegment = () => {
+    setSegments((prev) => {
+      const next = [...prev];
+      const lastIdx = next.length - 1;
+      next[lastIdx] = { ...next[lastIdx], angle: next[lastIdx].angle ?? 90, dir: next[lastIdx].dir ?? 1 };
+      next.push({ length: 100 });
+      return next;
+    });
+  };
+  const removeSegment = () => {
+    setSegments((prev) => {
+      if (prev.length <= 2) return prev;
+      const next = prev.slice(0, -1);
+      const lastIdx = next.length - 1;
+      next[lastIdx] = { length: next[lastIdx].length };
+      return next;
+    });
+  };
+  const updateSegment = (i, field, value) => {
+    setSegments((prev) => prev.map((s, idx) => (idx === i ? { ...s, [field]: value } : s)));
+  };
+
+  const genelPointsReal = isGeneral ? computeGeneralPoints(segments) : [];
+  const genelPointsSvg = isGeneral ? scalePointsToBox(genelPointsReal, 900, 300, 70) : [];
 
   // Köşebent (L) açı motoru: 90° tam L, 45° iç açı 45° olacak şekilde sol kol döner.
   // Ölçü okları her zaman büküm merkezinden kol ucuna kadar ve ilgili kola paralel kalır.
@@ -513,15 +624,54 @@ function App() {
 
       <section className="panel">
         <h2>{t.dims}</h2>
-        <div className="grid">
-          {input(isLProfile ? "A" : `A (${t.bottomLeftWord})`, A, setA)}
-          {input(isLProfile ? "B" : `B (${t.bottomRightWord})`, B, setB)}
-          {isLProfile && input(t.angleLabel, bendAngle, setBendAngle)}
-          {!isLProfile && input(`C (${t.leftWord})`, C, setC)}
-          {!isLProfile && input(`D (${t.rightWord})`, D, setD)}
-          {!isLProfile && input("EN", EN, setEN)}
-          {!isLProfile && input(t.lengthWord, H, setH)}
-        </div>
+        {isGeneral ? (
+          <div className="segmentEditor">
+            {segments.map((seg, i) => (
+              <div className="segmentRow" key={i}>
+                <span className="segmentIndex">{t.segment} {i + 1}</span>
+                <label>{t.segmentUzunluk}
+                  <input
+                    value={seg.length}
+                    inputMode="decimal"
+                    onChange={(e) => updateSegment(i, "length", Number(String(e.target.value).replace(",", ".")) || 0)}
+                  />
+                </label>
+                {i < segments.length - 1 && (
+                  <>
+                    <label>{t.segmentAci}
+                      <input
+                        value={seg.angle ?? 90}
+                        inputMode="decimal"
+                        onChange={(e) => updateSegment(i, "angle", Number(String(e.target.value).replace(",", ".")) || 0)}
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      className={"dirBtn " + (seg.dir === -1 ? "dirDown" : "dirUp")}
+                      onClick={() => updateSegment(i, "dir", seg.dir === -1 ? 1 : -1)}
+                    >
+                      {seg.dir === -1 ? `↓ ${t.yonAsagi}` : `↑ ${t.yonYukari}`}
+                    </button>
+                  </>
+                )}
+              </div>
+            ))}
+            <div className="segmentButtons">
+              <button type="button" onClick={addSegment}>{t.segmentEkle}</button>
+              {segments.length > 2 && <button type="button" onClick={removeSegment}>{t.segmentSil}</button>}
+            </div>
+          </div>
+        ) : (
+          <div className="grid">
+            {input(isLProfile ? "A" : `A (${t.bottomLeftWord})`, A, setA)}
+            {input(isLProfile ? "B" : `B (${t.bottomRightWord})`, B, setB)}
+            {isLProfile && input(t.angleLabel, bendAngle, setBendAngle)}
+            {isKapi && input(`C (${t.leftWord})`, C, setC)}
+            {isKapi && input(`D (${t.rightWord})`, D, setD)}
+            {isKapi && input("EN", EN, setEN)}
+            {isKapi && input(t.lengthWord, H, setH)}
+          </div>
+        )}
       </section>
 
       <section className="panel infoStrip">
@@ -533,8 +683,17 @@ function App() {
 
       <section className="panel">
         <h2>{t.results}</h2>
-        <div className="resultItem"><span>{t.cw}</span><b>{kesilecekEn.toFixed(1)} mm</b></div>
-        {!isLProfile && <div className="resultItem"><span>{t.ch}</span><b>{kesilecekBoy.toFixed(1)} mm</b></div>}
+        {isGeneral ? (
+          <>
+            <div className="resultItem"><span>{t.toplamUzunluk}</span><b>{kesilecekEn.toFixed(1)} mm</b></div>
+            <div className="resultItem"><span>{t.bukumSayisi}</span><b>{bendCount}</b></div>
+          </>
+        ) : (
+          <>
+            <div className="resultItem"><span>{t.cw}</span><b>{kesilecekEn.toFixed(1)} mm</b></div>
+            {isKapi && <div className="resultItem"><span>{t.ch}</span><b>{kesilecekBoy.toFixed(1)} mm</b></div>}
+          </>
+        )}
       </section>
 
       <section className="panel">
@@ -560,6 +719,28 @@ function App() {
               <path d={`M${cx + arcR} ${cy} A${arcR} ${arcR} 0 ${arcLarge} 0 ${arcEndX} ${arcEndY}`} className="angleArc" />
               <text x={cx + 80} y={cy - 36} className="angle">{lAngle}°</text>
               <text x="470" y="82" className="bottom">{t.cornerSingleBend}</text>
+            </svg>
+          ) : isGeneral ? (
+            <svg viewBox="0 0 900 300">
+              <path
+                d={genelPointsSvg.length ? "M" + genelPointsSvg.map((p) => `${p.x} ${p.y}`).join(" L") : ""}
+                className="profile"
+              />
+              {genelPointsSvg.slice(0, -1).map((p, i) => {
+                const p2 = genelPointsSvg[i + 1];
+                const midX = (p.x + p2.x) / 2;
+                const midY = (p.y + p2.y) / 2;
+                return (
+                  <text key={"seg" + i} x={midX} y={midY - 12} className="txt">
+                    {segments[i].length} mm
+                  </text>
+                );
+              })}
+              {genelPointsSvg.slice(1, -1).map((p, i) => (
+                <text key={"ang" + i} x={p.x} y={p.y - 20} className="angle">
+                  {segments[i].angle ?? 90}°
+                </text>
+              ))}
             </svg>
           ) : (
             <svg viewBox="0 0 900 360">
@@ -589,6 +770,7 @@ function App() {
         </div>
       </section>
 
+      {!isGeneral && (
       <section className="panel">
         <h2>{t.view3d} <small className="badge">{t.lockedBadge}</small></h2>
         <div className="view3dBox">
@@ -669,6 +851,7 @@ function App() {
           )}
         </div>
       </section>
+      )}
 
       <div className="actions">
         <button type="button" onClick={() => createPdf({ data, result, lang, action: "save" })}>{t.pdf}</button>

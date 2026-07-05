@@ -20,6 +20,9 @@ const PDF_DICT = {
     kesilecekEn: "KESİLECEK EN",
     kesilecekBoy: "KESİLECEK BOY",
     boyLabel: "BOY",
+    genelProfil: "GENEL PROFİL",
+    toplamUzunluk: "TOPLAM UZUNLUK",
+    bukumSayisi: "BÜKÜM SAYISI",
     slogan: "PROFESYONEL BÜKÜM ÇÖZÜMLERİ",
     shareTitle: "ÖZER BEND PRO PDF",
     shareText: "ÖZER BEND PRO teknik çizim PDF",
@@ -44,6 +47,9 @@ const PDF_DICT = {
     kesilecekEn: "CUT WIDTH",
     kesilecekBoy: "CUT LENGTH",
     boyLabel: "LENGTH",
+    genelProfil: "GENERAL PROFILE",
+    toplamUzunluk: "TOTAL LENGTH",
+    bukumSayisi: "BEND COUNT",
     slogan: "PROFESSIONAL BENDING SOLUTIONS",
     shareTitle: "ÖZER BEND PRO PDF",
     shareText: "ÖZER BEND PRO technical drawing PDF",
@@ -68,6 +74,9 @@ const PDF_DICT = {
     kesilecekEn: "LARGEUR DE COUPE",
     kesilecekBoy: "LONGUEUR DE COUPE",
     boyLabel: "LONGUEUR",
+    genelProfil: "PROFIL GÉNÉRAL",
+    toplamUzunluk: "LONGUEUR TOTALE",
+    bukumSayisi: "NOMBRE DE PLIS",
     slogan: "SOLUTIONS DE PLIAGE PROFESSIONNELLES",
     shareTitle: "ÖZER BEND PRO PDF",
     shareText: "PDF du dessin technique ÖZER BEND PRO",
@@ -92,6 +101,9 @@ const PDF_DICT = {
     kesilecekEn: "SCHNITTBREITE",
     kesilecekBoy: "SCHNITTLÄNGE",
     boyLabel: "LÄNGE",
+    genelProfil: "ALLGEMEINES PROFIL",
+    toplamUzunluk: "GESAMTLÄNGE",
+    bukumSayisi: "ANZAHL BIEGUNGEN",
     slogan: "PROFESSIONELLE BIEGELÖSUNGEN",
     shareTitle: "ÖZER BEND PRO PDF",
     shareText: "ÖZER BEND PRO technische Zeichnung PDF",
@@ -140,6 +152,38 @@ function safeNumber(value, fallback = 0) {
   return Number.isFinite(n) ? n : fallback;
 }
 
+// Genel profil (N segment) noktalarını gerçek mm koordinatlarında hesaplar.
+// main.jsx'teki computeGeneralPoints ile birebir aynı mantık.
+function computeGeneralPointsPdf(segments) {
+  const pts = [{ x: 0, y: 0 }];
+  let heading = 0;
+  for (let i = 0; i < segments.length; i++) {
+    const len = safeNumber(segments[i].length);
+    const rad = (heading * Math.PI) / 180;
+    const prev = pts[pts.length - 1];
+    pts.push({ x: prev.x + Math.cos(rad) * len, y: prev.y + Math.sin(rad) * len });
+    if (i < segments.length - 1) {
+      const ang = safeNumber(segments[i].angle, 90);
+      const dir = segments[i].dir === -1 ? -1 : 1;
+      heading += dir * (180 - ang);
+    }
+  }
+  return pts;
+}
+
+function scalePointsToBoxPdf(pts, boxX, boxY, boxW, boxH) {
+  const xs = pts.map((p) => p.x);
+  const ys = pts.map((p) => p.y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  const minY = Math.min(...ys), maxY = Math.max(...ys);
+  const w = Math.max(1, maxX - minX);
+  const h = Math.max(1, maxY - minY);
+  const scale = Math.min(boxW / w, boxH / h);
+  const offX = boxX + (boxW - w * scale) / 2 - minX * scale;
+  const offY = boxY + (boxH - h * scale) / 2 - minY * scale;
+  return pts.map((p) => ({ x: p.x * scale + offX, y: p.y * scale + offY }));
+}
+
 function fmt(value) {
   return safeNumber(value).toFixed(2);
 }
@@ -149,7 +193,7 @@ function mm(value) {
 }
 
 function makeFileName(data) {
-  const name = data?.profileType === "l" ? "kosebent-l" : "kapi-profili";
+  const name = data?.profileType === "l" ? "kosebent-l" : data?.profileType === "genel" ? "genel-profil" : "kapi-profili";
   const stamp = new Date().toISOString().slice(0, 16).replace(/[-:T]/g, "");
   return `ozer-bend-pro-${name}-${stamp}.pdf`;
 }
@@ -365,6 +409,7 @@ async function createPdfInner({ data, result, lang = "tr", action = "save" }) {
   const red = [210, 0, 0];
   const ink = [0, 0, 0];
   const isLProfile = data.profileType === "l";
+  const isGeneral = data.profileType === "genel";
 
   const rawA = safeNumber(data.A);
   const rawB = safeNumber(data.B);
@@ -416,7 +461,7 @@ async function createPdfInner({ data, result, lang = "tr", action = "save" }) {
 
   // Sade üst bilgi satırı.
   const info = [
-    [d.profil, isLProfile ? d.kosebentL : d.kapiProfili, 42],
+    [d.profil, isGeneral ? d.genelProfil : isLProfile ? d.kosebentL : d.kapiProfili, 42],
     [d.malzeme, materialLabel(material, lang), 32],
     [d.kalinlik, `${thickness.toFixed(2)} mm`, 34],
     [d.makine, machine, 42],
@@ -433,7 +478,33 @@ async function createPdfInner({ data, result, lang = "tr", action = "save" }) {
   doc.line(292.5, 29, 292.5, 50);
   doc.line(4.5, 50, 292.5, 50);
 
-  if (isLProfile) {
+  if (isGeneral) {
+    // Genel profil (N segment): gerçek noktaları hesapla, çizim alanına ölçekle.
+    const segs = Array.isArray(data.segments) ? data.segments : [];
+    const realPts = computeGeneralPointsPdf(segs);
+    const pts = scalePointsToBoxPdf(realPts, 20, 58, 257, 108);
+    doc.setDrawColor(...ink);
+    doc.setLineCap("round");
+    doc.setLineJoin("round");
+    doc.setLineWidth(2.4);
+    for (let i = 0; i < pts.length - 1; i++) {
+      doc.line(pts[i].x, pts[i].y, pts[i + 1].x, pts[i + 1].y);
+    }
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8.5);
+    doc.setTextColor(...red);
+    for (let i = 0; i < pts.length - 1; i++) {
+      const midX = (pts[i].x + pts[i + 1].x) / 2;
+      const midY = (pts[i].y + pts[i + 1].y) / 2;
+      doc.text(`${fmt(segs[i]?.length)} mm`, midX, midY - 4, { align: "center" });
+    }
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(8);
+    for (let i = 1; i < pts.length - 1; i++) {
+      const ang = segs[i - 1]?.angle ?? 90;
+      doc.text(`${ang}°`, pts[i].x, pts[i].y - 8, { align: "center" });
+    }
+  } else if (isLProfile) {
     // L profil için sade çizim korunur.
     const cx = 105, cy = 140;
     const lenA = 70;
@@ -507,12 +578,18 @@ async function createPdfInner({ data, result, lang = "tr", action = "save" }) {
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.35);
   doc.rect(4.5, 174, 288, 31);
-  drawFooterCell(doc, 6, 40, "A", mm(A), true);
-  drawFooterCell(doc, 46, 40, "B", mm(B), true);
-  drawFooterCell(doc, 86, 40, "C", mm(C), true);
-  drawFooterCell(doc, 126, 40, "D", mm(D), true);
-  drawFooterCell(doc, 166, 62, d.kesilecekEn, mm(kesilecekEn), true);
-  drawFooterCell(doc, 228, 63, d.kesilecekBoy, kesilecekBoy == null ? "-" : mm(kesilecekBoy), true);
+  if (isGeneral) {
+    const bendCountVal = Array.isArray(data.segments) ? Math.max(0, data.segments.length - 1) : 0;
+    drawFooterCell(doc, 4.5, 144, d.toplamUzunluk, mm(kesilecekEn), true);
+    drawFooterCell(doc, 148.5, 144, d.bukumSayisi, String(bendCountVal), true);
+  } else {
+    drawFooterCell(doc, 6, 40, "A", mm(A), true);
+    drawFooterCell(doc, 46, 40, "B", mm(B), true);
+    drawFooterCell(doc, 86, 40, "C", mm(C), true);
+    drawFooterCell(doc, 126, 40, "D", mm(D), true);
+    drawFooterCell(doc, 166, 62, d.kesilecekEn, mm(kesilecekEn), true);
+    drawFooterCell(doc, 228, 63, d.kesilecekBoy, kesilecekBoy == null ? "-" : mm(kesilecekBoy), true);
+  }
 
   await outputPdf(doc, fileName, action, lang);
 }
