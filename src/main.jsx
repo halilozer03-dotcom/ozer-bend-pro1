@@ -732,16 +732,16 @@ const DICT = {
 };
 
 const LANGUAGES = [
-  { code: "tr", flag: "TR", label: "Türkçe" },
-  { code: "en", flag: "GB", label: "English" },
-  { code: "fr", flag: "FR", label: "Français" },
-  { code: "de", flag: "DE", label: "Deutsch" },
-  { code: "es", flag: "ES", label: "Español" },
-  { code: "it", flag: "IT", label: "Italiano" },
-  { code: "ru", flag: "RU", label: "Русский" },
-  { code: "pt", flag: "PT", label: "Português" },
-  { code: "pl", flag: "PL", label: "Polski" },
-  { code: "zh", flag: "CN", label: "中文" }
+  { code: "tr", flag: "🇹🇷", label: "Türkçe" },
+  { code: "en", flag: "🇬🇧", label: "English" },
+  { code: "fr", flag: "🇫🇷", label: "Français" },
+  { code: "de", flag: "🇩🇪", label: "Deutsch" },
+  { code: "es", flag: "🇪🇸", label: "Español" },
+  { code: "it", flag: "🇮🇹", label: "Italiano" },
+  { code: "ru", flag: "🇷🇺", label: "Русский" },
+  { code: "pt", flag: "🇵🇹", label: "Português" },
+  { code: "pl", flag: "🇵🇱", label: "Polski" },
+  { code: "zh", flag: "🇨🇳", label: "中文" }
 ];
 
 function App() {
