@@ -53,21 +53,39 @@ const upperDies = [
 const materials = ["DKP", "Galvaniz", "INOX 304", "INOX 316", "Alüminyum 1050", "Alüminyum 5754", "Hardox"];
 const thicknesses = [0.8, 1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6];
 const profileTypes = [
-  { value: "kapi", labelTr: "Kapı Profili", labelFr: "Profil porte", labelEn: "Door Profile", labelDe: "Türprofil" },
-  { value: "l", labelTr: "Köşebent (L)", labelFr: "Cornière (L)", labelEn: "Corner (L)", labelDe: "Winkel (L)" },
-  { value: "genel", labelTr: "Genel Profil", labelFr: "Profil général", labelEn: "General Profile", labelDe: "Allgemeines Profil" }
+  { value: "kapi", labelTr: "Kapı Profili", labelFr: "Profil porte", labelEn: "Door Profile", labelDe: "Türprofil",
+    labelEs: "Perfil de Puerta", labelIt: "Profilo Porta", labelRu: "Профиль двери", labelPt: "Perfil da Porta",
+    labelPl: "Profil Drzwiowy", labelZh: "门型材", labelAr: "بروفايل الباب" },
+  { value: "l", labelTr: "Köşebent (L)", labelFr: "Cornière (L)", labelEn: "Corner (L)", labelDe: "Winkel (L)",
+    labelEs: "Escuadra (L)", labelIt: "Angolare (L)", labelRu: "Угол (L)", labelPt: "Cantoneira (L)",
+    labelPl: "Kątownik (L)", labelZh: "角型材 (L)", labelAr: "زاوية (L)" },
+  { value: "genel", labelTr: "Genel Profil", labelFr: "Profil général", labelEn: "General Profile", labelDe: "Allgemeines Profil",
+    labelEs: "Perfil General", labelIt: "Profilo Generale", labelRu: "Общий профиль", labelPt: "Perfil Geral",
+    labelPl: "Profil Ogólny", labelZh: "通用型材", labelAr: "بروفايل عام" }
 ];
 
+function profileTypeLabel(item, lang) {
+  const key = "label" + lang.charAt(0).toUpperCase() + lang.slice(1);
+  return item[key] || item.labelEn;
+}
+
 function materialLabel(code, lang) {
+  const GALVANIZED = {
+    tr: "Galvaniz", en: "Galvanized", de: "Verzinkt", fr: "Galvanisé",
+    es: "Galvanizado", it: "Zincato", ru: "Оцинкованный", pt: "Galvanizado",
+    pl: "Ocynkowany", zh: "镀锌", ar: "مجلفن"
+  };
+  const ALUMINUM = {
+    tr: "Alüminyum", en: "Aluminium", de: "Aluminium", fr: "Aluminium",
+    es: "Aluminio", it: "Alluminio", ru: "Алюминий", pt: "Alumínio",
+    pl: "Aluminium", zh: "铝", ar: "ألمنيوم"
+  };
   if (code === "Galvaniz") {
-    if (lang === "en") return "Galvanized";
-    if (lang === "de") return "Verzinkt";
-    if (lang === "fr") return "Galvanisé";
-    return "Galvaniz";
+    return GALVANIZED[lang] || GALVANIZED.tr;
   }
   if (code.startsWith("Alüminyum")) {
     const suffix = code.replace("Alüminyum", "").trim();
-    const word = lang === "tr" ? "Alüminyum" : "Aluminium";
+    const word = ALUMINUM[lang] || ALUMINUM.tr;
     return `${word} ${suffix}`.trim();
   }
   return code;
@@ -807,7 +825,19 @@ const LANGUAGES = [
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
-  const [lang, setLang] = useState("tr");
+  const [lang, setLang] = useState(() => {
+    try {
+      const saved = localStorage.getItem("ozerbend_lang");
+      if (saved) return saved;
+    } catch (e) {}
+    return "tr";
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("ozerbend_lang", lang);
+    } catch (e) {}
+  }, [lang]);
   const [showSettings, setShowSettings] = useState(false);
   const [showFullscreen, setShowFullscreen] = useState(false);
   const [showLangMenu, setShowLangMenu] = useState(false);
@@ -1303,7 +1333,7 @@ function App() {
               className={profileType === item.value ? "active" : ""}
               onClick={() => setProfileType(item.value)}
             >
-              {lang === "tr" ? item.labelTr : lang === "fr" ? item.labelFr : lang === "de" ? item.labelDe : item.labelEn}
+              {profileTypeLabel(item, lang)}
             </button>
           ))}
         </div>
