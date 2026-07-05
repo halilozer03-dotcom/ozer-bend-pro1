@@ -179,6 +179,12 @@ const DICT = {
     yonAsagi: "Aşağı",
     segmentEkle: "+ Segment Ekle",
     segmentSil: "Kaldır",
+    favorites: "Favoriler",
+    favSave: "Kaydet",
+    favLoad: "Yükle",
+    favDelete: "Sil",
+    favEmpty: "Kayıtlı favori yok.",
+    favNamePrompt: "Favori adı:",
     toplamUzunluk: "Toplam Kesilecek Uzunluk",
     bukumSayisi: "Büküm Sayısı",
     segment: "Segment"
@@ -233,6 +239,12 @@ const DICT = {
     yonAsagi: "Down",
     segmentEkle: "+ Add Segment",
     segmentSil: "Remove",
+    favorites: "Favorites",
+    favSave: "Save",
+    favLoad: "Load",
+    favDelete: "Delete",
+    favEmpty: "No favorites saved.",
+    favNamePrompt: "Favorite name:",
     toplamUzunluk: "Total Cut Length",
     bukumSayisi: "Bend Count",
     segment: "Segment"
@@ -287,6 +299,12 @@ const DICT = {
     yonAsagi: "Bas",
     segmentEkle: "+ Ajouter un segment",
     segmentSil: "Retirer",
+    favorites: "Favoris",
+    favSave: "Enregistrer",
+    favLoad: "Charger",
+    favDelete: "Supprimer",
+    favEmpty: "Aucun favori enregistré.",
+    favNamePrompt: "Nom du favori :",
     toplamUzunluk: "Longueur totale de coupe",
     bukumSayisi: "Nombre de plis",
     segment: "Segment"
@@ -341,6 +359,12 @@ const DICT = {
     yonAsagi: "Unten",
     segmentEkle: "+ Segment hinzufügen",
     segmentSil: "Entfernen",
+    favorites: "Favoriten",
+    favSave: "Speichern",
+    favLoad: "Laden",
+    favDelete: "Löschen",
+    favEmpty: "Keine Favoriten gespeichert.",
+    favNamePrompt: "Favoritenname:",
     toplamUzunluk: "Gesamte Schnittlänge",
     bukumSayisi: "Anzahl der Biegungen",
     segment: "Segment"
@@ -387,6 +411,49 @@ function App() {
   const [deduct, setDeduct] = useState(15);
   const [manualBd, setManualBd] = useState(false);
   const [manualBdValue, setManualBdValue] = useState(3.30);
+  const [favorites, setFavorites] = useState([]);
+  const [showFavorites, setShowFavorites] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("ozerbend_favorites");
+      if (raw) setFavorites(JSON.parse(raw));
+    } catch (e) {}
+  }, []);
+
+  const persistFavorites = (list) => {
+    setFavorites(list);
+    try {
+      localStorage.setItem("ozerbend_favorites", JSON.stringify(list));
+    } catch (e) {}
+  };
+
+  const saveFavorite = () => {
+    const name = window.prompt(t.favNamePrompt || "Favori adi:");
+    if (!name) return;
+    const fav = {
+      id: Date.now(),
+      name,
+      profileType, A, B, C, D, EN, H,
+      segments: isGeneral ? segments : undefined,
+      material, thickness, bendAngle, insideR, deduct, manualBd, manualBdValue,
+    };
+    persistFavorites([fav, ...favorites]);
+  };
+
+  const applyFavorite = (fav) => {
+    setProfileType(fav.profileType);
+    setA(fav.A); setB(fav.B); setC(fav.C); setD(fav.D); setEN(fav.EN); setH(fav.H);
+    if (fav.segments) setSegments(fav.segments);
+    setMaterial(fav.material); setThickness(fav.thickness);
+    setBendAngle(fav.bendAngle); setInsideR(fav.insideR);
+    setDeduct(fav.deduct); setManualBd(fav.manualBd); setManualBdValue(fav.manualBdValue);
+    setShowFavorites(false);
+  };
+
+  const deleteFavorite = (id) => {
+    persistFavorites(favorites.filter((f) => f.id !== id));
+  };
 
   const t = DICT[lang] || DICT.tr;
 
@@ -816,7 +883,30 @@ function App() {
       </section>
 
       <section className="panel">
+        <div className="dimsHeaderRow">
         <h2>{t.dims}</h2>
+        <div className="favWrap">
+          <button type="button" className="favBtn" onClick={() => setShowFavorites(!showFavorites)}>⭐ {t.favorites}</button>
+          <button type="button" className="favBtn" onClick={saveFavorite}>💾 {t.favSave}</button>
+        </div>
+      </div>
+      {showFavorites && (
+        <div className="favPanel">
+          {favorites.length === 0 ? (
+            <p className="favEmpty">{t.favEmpty}</p>
+          ) : (
+            favorites.map((fav) => (
+              <div className="favRow" key={fav.id}>
+                <span>{fav.name}</span>
+                <div>
+                  <button type="button" onClick={() => applyFavorite(fav)}>{t.favLoad}</button>
+                  <button type="button" onClick={() => deleteFavorite(fav.id)}>{t.favDelete}</button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
         {isGeneral ? (
           <div className="segmentEditor">
             {segments.map((seg, i) => (
