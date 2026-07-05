@@ -617,3 +617,42 @@ input:focus,select:focus{
 [dir="rtl"] .infoStrip div {
   flex-direction: row-reverse;
 }
+
+
+/* ==== RTL (Arapca) destegi ==== */
+[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="rtl"] .grid,
+[dir="rtl"] .actions,
+[dir="rtl"] .actionsSingle,
+[dir="rtl"] .segmentRow,
+[dir="rtl"] .segmentButtons,
+[dir="rtl"] .favRow,
+[dir="rtl"] .favWrap,
+[dir="rtl"] .topButtons,
+[dir="rtl"] .brand,
+[dir="rtl"] .profileChoice,
+[dir="rtl"] .langMenuWrap,
+[dir="rtl"] .dimsHeaderRow {
+  direction: rtl;
+}
+
+[dir="rtl"] input,
+[dir="rtl"] select,
+[dir="rtl"] label {
+  text-align: right;
+}
+
+[dir="rtl"] .langMenu {
+  right: auto;
+  left: 0;
+  text-align: right;
+}
+
+[dir="rtl"] .resultItem,
+[dir="rtl"] .infoStrip div {
+  flex-direction: row-reverse;
+}
