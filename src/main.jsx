@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./style.css";
 import { createPdf } from "./pdf/pdf";
+import FreeDrawCanvas from "./freedraw";
 import logoUrl from "./assets/logo.jpg";
 import FullscreenViewer from "./viewer3d";
 
@@ -51,6 +52,15 @@ const upperDies = [
 // Dahili kodlar sabit kalır (hesaplamalar buna göre yapılır); ekranda
 // gösterilecek isim materialLabel() ile dile göre çevrilir.
 const materials = ["DKP", "Galvaniz", "INOX 304", "INOX 316", "Alüminyum 1050", "Alüminyum 5754", "Hardox"];
+const MATERIAL_DENSITY = {
+  "DKP": 7.85,
+  "Galvaniz": 7.85,
+  "INOX 304": 8.00,
+  "INOX 316": 8.00,
+  "Alüminyum 1050": 2.71,
+  "Alüminyum 5754": 2.66,
+  "Hardox": 7.85
+};
 const thicknesses = [0.8, 1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6];
 const profileTypes = [
   { value: "kapi", labelTr: "Kapı Profili", labelFr: "Profil porte", labelEn: "Door Profile", labelDe: "Türprofil",
@@ -844,6 +854,7 @@ function App() {
   const langMenuRef = useRef(null);
 
   const [profileType, setProfileType] = useState("kapi");
+  const [freeDrawOpen, setFreeDrawOpen] = useState(false);
 
   const [A, setA] = useState(20);
   const [B, setB] = useState(20);
@@ -977,7 +988,11 @@ function App() {
   const kesilecekEn = isKapi ? total - bdToplam - deduct : total - bdToplam;
   const kesilecekBoy = isKapi ? H - deduct : null;
   const data = { profileType, A, B, C, D, EN, H, bd, deduct, material, kalip: lowerDie, upperDie, machine, thickness, aci: bendAngle, icR: insideR, bendCount, segments: isGeneral ? segments : undefined };
-  const result = { kesilecekEn, kesilecekBoy, bdToplam };
+  const materialDensityGCm3 = MATERIAL_DENSITY[material] ?? 7.85;
+  const weightKg = isKapi && kesilecekBoy != null
+    ? (kesilecekEn * kesilecekBoy * Number(thickness) * materialDensityGCm3) / 1e6
+    : null;
+  const result = { kesilecekEn, kesilecekBoy, bdToplam, weightKg };
 
   const addSegment = () => {
     setSegments((prev) => {
@@ -1354,7 +1369,26 @@ function App() {
             </button>
           ))}
         </div>
+        <button
+          type="button"
+          onClick={() => setFreeDrawOpen(true)}
+          style={{ width: "100%", marginTop: 10 }}
+        >
+          Serbest Çizim
+        </button>
       </section>
+
+      {freeDrawOpen && (
+        <FreeDrawCanvas
+          maxSegments={15}
+          onClose={() => setFreeDrawOpen(false)}
+          onCommit={(segs) => {
+            setSegments(segs);
+            setProfileType("genel");
+            setFreeDrawOpen(false);
+          }}
+        />
+      )}
 
       <section className="panel">
         <div className="dimsHeaderRow">
@@ -1449,6 +1483,7 @@ function App() {
           <>
             <div className="resultItem"><span>{t.cw}</span><b>{kesilecekEn.toFixed(1)} mm</b></div>
             {isKapi && <div className="resultItem"><span>{t.ch}</span><b>{kesilecekBoy.toFixed(1)} mm</b></div>}
+                {isKapi && result.weightKg != null && <div className="resultItem"><span>{t.weight}</span><b>{result.weightKg.toFixed(2)} kg</b></div>}
           </>
         )}
       </section>
