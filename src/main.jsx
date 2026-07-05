@@ -1218,7 +1218,7 @@ function App() {
   const currentLangInfo = LANGUAGES.find((l) => l.code === lang) || LANGUAGES[0];
 
   return (
-    <main className="app">
+    <main className="app" dir={lang === "ar" ? "rtl" : "ltr"}>
       <header className="top">
         <div className="brand">
           <img src={logoUrl} alt="ÖZER BEND PRO" />
