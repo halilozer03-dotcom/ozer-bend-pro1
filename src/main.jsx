@@ -1392,7 +1392,17 @@ function App() {
         <button
           type="button"
           onClick={() => setFreeDrawOpen(true)}
-          style={{ width: "100%", marginTop: 10 }}
+          style={{
+            width: "100%",
+            marginTop: 10,
+            padding: "14px 18px",
+            borderRadius: 12,
+            border: "1px solid rgba(207,213,218,.35)",
+            background: "#1b2129",
+            color: "#eef1f3",
+            fontWeight: 700,
+            fontSize: 16
+          }}
         >
           Serbest Çizim
         </button>
