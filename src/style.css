@@ -512,6 +512,17 @@ input:focus,select:focus{
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  flex-wrap: wrap;
+  row-gap: 10px;
+}
+
+.dimsHeaderRow h2 {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.favWrap {
+  flex: 0 0 auto;
 }
 
 .favWrap {
