@@ -574,17 +574,42 @@ function App() {
         const p2 = genelPointsSvg[i + 1];
         const midX = (p.x + p2.x) / 2;
         const midY = (p.y + p2.y) / 2;
+        const dx = p2.x - p.x;
+        const dy = p2.y - p.y;
+        const len = Math.sqrt(dx * dx + dy * dy) || 1;
+        const nx = -dy / len;
+        const ny = dx / len;
+        const offset = 16;
+        const labelX = midX + nx * offset;
+        const labelY = midY + ny * offset;
+        const lengthValue = Math.round(segments[i].length * 100) / 100;
         return (
-          <text key={"seg" + i} x={midX} y={midY - 12} className="txt">
-            {segments[i].length} mm
+          <text key={"seg" + i} x={labelX} y={labelY} className="txt">
+            {lengthValue} mm
           </text>
         );
       })}
-      {genelPointsSvg.slice(1, -1).map((p, i) => (
-        <text key={"ang" + i} x={p.x} y={p.y - 20} className="angle">
-          {segments[i].angle ?? 90}°
-        </text>
-      ))}
+      {genelPointsSvg.slice(1, -1).map((p, i) => {
+        const prev = genelPointsSvg[i];
+        const next = genelPointsSvg[i + 2];
+        const dx1 = p.x - prev.x;
+        const dy1 = p.y - prev.y;
+        const dx2 = next.x - p.x;
+        const dy2 = next.y - p.y;
+        const len1 = Math.sqrt(dx1 * dx1 + dy1 * dy1) || 1;
+        const len2 = Math.sqrt(dx2 * dx2 + dy2 * dy2) || 1;
+        const bx = (dx1 / len1) - (dx2 / len2);
+        const by = (dy1 / len1) - (dy2 / len2);
+        const blen = Math.sqrt(bx * bx + by * by) || 1;
+        const offset = 22;
+        const labelX = p.x + (bx / blen) * offset;
+        const labelY = p.y + (by / blen) * offset;
+        return (
+          <text key={"ang" + i} x={labelX} y={labelY} className="angle">
+            {segments[i].angle ?? 90}°
+          </text>
+        );
+      })}
     </svg>
   ) : (
     <svg viewBox="0 0 900 360">
