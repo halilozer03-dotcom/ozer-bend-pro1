@@ -84,11 +84,11 @@ function buildExtrudedMesh(points, thickness, depth) {
 
   const material = new THREE.MeshPhysicalMaterial({
     color: 0xc4cad2,
-    metalness: 0.75,
-    roughness: 0.28,
-    clearcoat: 0.35,
-    clearcoatRoughness: 0.25,
-    envMapIntensity: 1.15
+    metalness: 0.5,
+    roughness: 0.6,
+    clearcoat: 0.1,
+    clearcoatRoughness: 0.7,
+    envMapIntensity: 0.5
   });
   const mesh = new THREE.Mesh(geometry, material);
   const size = new THREE.Vector3();

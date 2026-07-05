@@ -1045,6 +1045,23 @@ function App() {
     ]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isGeneral, isLProfile, A, B, C, D, EN, bendAngle, lAngle, segments]);
+
+  // Sadece "Kapi Profili" modunda, 3D onizlemede ayak/buku (A/B/C/D) olculerini
+  // gorsel olarak buyutuyoruz ki bukumler ekranda net secilsin. EN (ana yuz
+  // uzunlugu) ve tum gercek hesaplamalar (PDF, kesilecek en/boy, etiketler)
+  // BU DEGERDEN ETKILENMEZ — sadece 3D gorunumu icin ayri bir nokta dizisi.
+  const DISPLAY_LEG_SCALE = 2;
+  const crossSection3DDisplay = useMemo(() => {
+    if (!isKapi) return crossSection3D;
+    return computeGeneralPoints([
+      { length: A * DISPLAY_LEG_SCALE, angle: bendAngle, dir: 1 },
+      { length: B * DISPLAY_LEG_SCALE, angle: bendAngle, dir: 1 },
+      { length: EN, angle: bendAngle, dir: 1 },
+      { length: C * DISPLAY_LEG_SCALE, angle: bendAngle, dir: 1 },
+      { length: D * DISPLAY_LEG_SCALE }
+    ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isKapi, crossSection3D, A, B, C, D, EN, bendAngle]);
   const crossSectionXs = crossSection3D.map((p) => p.x);
   const crossSectionYs = crossSection3D.map((p) => p.y);
   const crossSectionSize = Math.max(
@@ -1465,7 +1482,7 @@ function App() {
 
       {showFullscreen && (
         <FullscreenViewer
-          points={crossSection3D}
+          points={crossSection3DDisplay}
           thickness={thickness}
           depth={extrusionDepth3D}
           svgContent={drawing2D}
