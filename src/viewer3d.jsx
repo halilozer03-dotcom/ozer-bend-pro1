@@ -59,12 +59,16 @@ function buildExtrudedMesh(points, thickness, depth) {
   geometry.translate(-center.x, -center.y, -center.z);
   geometry.computeVertexNormals();
 
-  const material = new THREE.MeshStandardMaterial({ color: 0xb8bec7, metalness: 0.65, roughness: 0.38 });
+  const material = new THREE.MeshStandardMaterial({ color: 0xc4cad2, metalness: 0.55, roughness: 0.42 });
   const mesh = new THREE.Mesh(geometry, material);
   const size = new THREE.Vector3();
   geometry.boundingBox.getSize(size);
   const radius = Math.max(size.x, size.y, size.z, 10) / 2;
-  return { mesh, radius };
+  // Kesit (fold) boyutu genelde uzunluktan (derinlik) çok küçüktür; kamerayı
+  // kesit şekline göre çerçeveleyip uzunluğu perspektifle geriye ittiriyoruz,
+  // böylece bükümler ekranda küçük/görünmez kalmaz.
+  const crossSpan = Math.max(size.x, size.y, 10);
+  return { mesh, radius, crossSpan, depthSize: size.z };
 }
 
 function ThreeDCanvas({ points, thickness, depth }) {
@@ -86,11 +90,13 @@ function ThreeDCanvas({ points, thickness, depth }) {
     renderer.setSize(width, height);
     mount.appendChild(renderer.domElement);
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.55));
-    const dir1 = new THREE.DirectionalLight(0xffffff, 0.9);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.85));
+    const hemi = new THREE.HemisphereLight(0xffffff, 0x3a3f4a, 0.6);
+    scene.add(hemi);
+    const dir1 = new THREE.DirectionalLight(0xffffff, 1.15);
     dir1.position.set(1, 1.4, 1.2);
     scene.add(dir1);
-    const dir2 = new THREE.DirectionalLight(0xffe9b0, 0.4);
+    const dir2 = new THREE.DirectionalLight(0xffe9b0, 0.55);
     dir2.position.set(-1, -0.6, -1);
     scene.add(dir2);
 
@@ -99,10 +105,12 @@ function ThreeDCanvas({ points, thickness, depth }) {
     if (built) {
       mesh = built.mesh;
       scene.add(mesh);
-      const dist = built.radius * 3.2;
-      camera.position.set(dist, dist * 0.7, dist);
-      camera.near = Math.max(0.1, built.radius / 100);
-      camera.far = dist * 50;
+      // Kamerayı kesit (fold) boyutuna göre çerçevele, uzunluk perspektifle
+      // geriye gitsin — bükümler ekranda küçük/görünmez kalmasın.
+      const camDist = built.crossSpan * 3.4;
+      camera.position.set(camDist * 0.85, camDist * 0.65, camDist * 0.55 + built.depthSize * 0.12);
+      camera.near = Math.max(0.1, built.crossSpan / 100);
+      camera.far = (camDist + built.depthSize) * 20;
       camera.updateProjectionMatrix();
     }
 
@@ -110,8 +118,8 @@ function ThreeDCanvas({ points, thickness, depth }) {
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
     controls.rotateSpeed = 0.9;
-    controls.minDistance = built ? built.radius * 0.5 : 10;
-    controls.maxDistance = built ? built.radius * 12 : 1000;
+    controls.minDistance = built ? built.crossSpan * 0.6 : 10;
+    controls.maxDistance = built ? built.radius * 15 : 1000;
 
     let frameId;
     const animate = () => {
@@ -196,7 +204,10 @@ export default function FullscreenViewer({ points, thickness, depth, svgContent,
           <button className={mode === "2d" ? "active" : ""} onClick={() => setMode("2d")}>2D</button>
           <button className={mode === "3d" ? "active" : ""} onClick={() => setMode("3d")}>3D</button>
         </div>
-        <button className="fsClose" onClick={onClose}>✕</button>
+        <div className="fsRightBtns">
+          {mode === "2d" && <button className="fsClose" onClick={zp.reset} title="Sıfırla">⟲</button>}
+          <button className="fsClose" onClick={onClose}>✕</button>
+        </div>
       </div>
 
       {mode === "2d" && (

@@ -500,17 +500,21 @@ function App() {
   // 3D görünüm için: her profil türünü aynı segment zincirine çevirip tek bir
   // kesit (cross-section) nokta dizisi üretiyoruz. Sadece görselleştirme
   // amaçlıdır, sayısal hesaplamaları (BD, kesilecek ölçü) etkilemez.
-  const crossSection3D = isGeneral
-    ? genelPointsReal
-    : isLProfile
-      ? computeGeneralPoints([{ length: B, angle: lAngle, dir: -1 }, { length: A }])
-      : computeGeneralPoints([
-          { length: A, angle: bendAngle, dir: 1 },
-          { length: B, angle: bendAngle, dir: -1 },
-          { length: EN, angle: bendAngle, dir: -1 },
-          { length: C, angle: bendAngle, dir: 1 },
-          { length: D }
-        ]);
+  // useMemo: sadece gerçekten ilgili değerler değiştiğinde yeniden hesaplanır,
+  // böylece 3D sahne ilgisiz her render'da sıfırdan kurulmaz (döndürme
+  // konumu korunur).
+  const crossSection3D = useMemo(() => {
+    if (isGeneral) return genelPointsReal;
+    if (isLProfile) return computeGeneralPoints([{ length: B, angle: lAngle, dir: -1 }, { length: A }]);
+    return computeGeneralPoints([
+      { length: A, angle: bendAngle, dir: 1 },
+      { length: B, angle: bendAngle, dir: 1 },
+      { length: EN, angle: bendAngle, dir: 1 },
+      { length: C, angle: bendAngle, dir: 1 },
+      { length: D }
+    ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isGeneral, isLProfile, A, B, C, D, EN, bendAngle, lAngle, segments]);
   const crossSectionXs = crossSection3D.map((p) => p.x);
   const crossSectionYs = crossSection3D.map((p) => p.y);
   const crossSectionSize = Math.max(
