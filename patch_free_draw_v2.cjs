@@ -1,4 +1,19 @@
-import React, { useRef, useState, useCallback } from "react";
+// patch_free_draw_v2.cjs
+// Serbest Cizim'i yeniden yazar:
+// 1) Baslangic noktasi artik otomatik ortada degil - ilk dokunuslar sen sec.
+// 2) Yeni cizim, hangi uca (ilk nokta mi son nokta mi) daha yakinsa oraya
+//    baglanir - her zaman "son cizgiye" zorunlu baglanti YOK.
+// 3) Yakinlastirma (+/-) kontrolu eklendi, varsayilan gorunum alani kucultuldu
+//    (kisa segmentler artik mini kalmiyor).
+// 4) Undo artik gercek bir gecmis yigini (history stack) kullanir, prepend/
+//    append farketmeksizin doğru calisir.
+
+const fs = require("fs");
+const path = require("path");
+
+const FREEDRAW_JSX = path.join(process.cwd(), "src", "freedraw.jsx");
+
+const FREEDRAW_CONTENT = `import React, { useRef, useState, useCallback } from "react";
 
 const GRID_MM = 5;
 const ANGLE_STEP = 15;
@@ -178,7 +193,7 @@ export default function FreeDrawCanvas({ maxSegments, onCommit, onClose }) {
     liveLabel = {
       x: (anchorPoint.x + drag.x) / 2,
       y: (anchorPoint.y + drag.y) / 2,
-      text: `${len} mm  •  ${angleDeg}°`
+      text: \`\${len} mm  •  \${angleDeg}°\`
     };
   }
 
@@ -189,16 +204,16 @@ export default function FreeDrawCanvas({ maxSegments, onCommit, onClose }) {
   const gridLines = [];
   for (let g = Math.floor(vbX / gridStep) * gridStep; g <= half; g += gridStep) {
     gridLines.push(
-      <line key={`v${g}`} x1={g} y1={vbY} x2={g} y2={half} stroke="rgba(255,255,255,0.10)" strokeWidth={viewSize / 300} />
+      <line key={\`v\${g}\`} x1={g} y1={vbY} x2={g} y2={half} stroke="rgba(255,255,255,0.10)" strokeWidth={viewSize / 300} />
     );
     gridLines.push(
-      <line key={`h${g}`} x1={vbX} y1={g} x2={half} y2={g} stroke="rgba(255,255,255,0.10)" strokeWidth={viewSize / 300} />
+      <line key={\`h\${g}\`} x1={vbX} y1={g} x2={half} y2={g} stroke="rgba(255,255,255,0.10)" strokeWidth={viewSize / 300} />
     );
   }
 
   const pathD =
     points.length > 0
-      ? points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ")
+      ? points.map((p, i) => \`\${i === 0 ? "M" : "L"} \${p.x} \${p.y}\`).join(" ")
       : "";
 
   const strokeW = Math.max(1, viewSize / 60);
@@ -219,7 +234,7 @@ export default function FreeDrawCanvas({ maxSegments, onCommit, onClose }) {
 
       <svg
         ref={svgRef}
-        viewBox={`${vbX} ${vbY} ${viewSize} ${viewSize}`}
+        viewBox={\`\${vbX} \${vbY} \${viewSize} \${viewSize}\`}
         style={{ flex: 1, width: "100%", touchAction: "none" }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
@@ -230,13 +245,13 @@ export default function FreeDrawCanvas({ maxSegments, onCommit, onClose }) {
         <line x1={0} y1={vbY} x2={0} y2={half} stroke="rgba(255,255,255,0.18)" strokeWidth={viewSize / 250} />
         {pathD && <path d={pathD} stroke="#c4cad2" strokeWidth={strokeW} fill="none" strokeLinecap="round" strokeLinejoin="round" />}
         {drag && anchorPoint && (
-          <line x1={anchorPoint.x} y1={anchorPoint.y} x2={drag.x} y2={drag.y} stroke="#ffd35a" strokeWidth={strokeW} strokeDasharray={`${strokeW * 2.4} ${strokeW * 1.6}`} />
+          <line x1={anchorPoint.x} y1={anchorPoint.y} x2={drag.x} y2={drag.y} stroke="#ffd35a" strokeWidth={strokeW} strokeDasharray={\`\${strokeW * 2.4} \${strokeW * 1.6}\`} />
         )}
         {points.map((p, i) => (
           <circle key={i} cx={p.x} cy={p.y} r={dotR} fill={i === 0 ? "#ffd35a" : "#c4cad2"} />
         ))}
         {liveLabel && (
-          <g transform={`translate(${liveLabel.x}, ${liveLabel.y - dotR * 3})`}>
+          <g transform={\`translate(\${liveLabel.x}, \${liveLabel.y - dotR * 3})\`}>
             <rect x={-viewSize * 0.16} y={-viewSize * 0.045} width={viewSize * 0.32} height={viewSize * 0.09} rx={viewSize * 0.02} fill="rgba(0,0,0,0.8)" />
             <text x={0} y={viewSize * 0.012} textAnchor="middle" fill="#ffd35a" fontSize={viewSize * 0.05} fontWeight={800}>{liveLabel.text}</text>
           </g>
@@ -275,3 +290,10 @@ export default function FreeDrawCanvas({ maxSegments, onCommit, onClose }) {
     </div>
   );
 }
+`;
+
+fs.writeFileSync(FREEDRAW_JSX, FREEDRAW_CONTENT, "utf8");
+console.log("[OK] src/freedraw.jsx guncellendi (v2 - serbest baslangic + iki yonlu baglanti + zoom)");
+
+console.log("\n✅ SERBEST CIZIM V2 BASARIYLA UYGULANDI.");
+console.log("Simdi: git add -A && git commit -m \"Serbest Cizim v2: serbest baslangic, iki yonlu uc baglama, zoom\" && git push -u origin main");
