@@ -5,7 +5,7 @@ import { createPdf } from "./pdf/pdf";
 import logoUrl from "./assets/logo.jpg";
 import FullscreenViewer from "./viewer3d";
 
-const FEEDBACK_EMAIL = "halilozer03@gmail.com";
+const FEEDBACK_EMAIL = "ozerbend@gmail.com";
 
 function openFeedbackMail({ subject, message }) {
   try {

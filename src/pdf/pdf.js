@@ -494,10 +494,29 @@ async function createPdfInner({ data, result, lang = "tr", action = "save" }) {
     doc.setFontSize(8.5);
     doc.setTextColor(...red);
     for (let i = 0; i < pts.length - 1; i++) {
-      const midX = (pts[i].x + pts[i + 1].x) / 2;
-      const midY = (pts[i].y + pts[i + 1].y) / 2;
-      doc.text(`${fmt(segs[i]?.length)} mm`, midX, midY - 4, { align: "center" });
-    }
+          const cxAll = pts.reduce((s, pt) => s + pt.x, 0) / pts.length;
+          const cyAll = pts.reduce((s, pt) => s + pt.y, 0) / pts.length;
+          const p1 = pts[i];
+          const p2 = pts[i + 1];
+          const midX = (p1.x + p2.x) / 2;
+          const midY = (p1.y + p2.y) / 2;
+          const dx = p2.x - p1.x;
+          const dy = p2.y - p1.y;
+          const len = Math.sqrt(dx * dx + dy * dy) || 1;
+          let nx = -dy / len;
+          let ny = dx / len;
+          if (nx * (midX - cxAll) + ny * (midY - cyAll) < 0) {
+            nx = -nx;
+            ny = -ny;
+          }
+          const offset = 7;
+          const labelX = midX + nx * offset;
+          const labelY = midY + ny * offset;
+          let angleDeg = Math.atan2(dy, dx) * 180 / Math.PI;
+          if (angleDeg > 90) angleDeg -= 180;
+          if (angleDeg < -90) angleDeg += 180;
+          doc.text(`${fmt(segs[i]?.length)} mm`, labelX, labelY, { align: "center", angle: angleDeg });
+        }
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(8);
     for (let i = 1; i < pts.length - 1; i++) {
