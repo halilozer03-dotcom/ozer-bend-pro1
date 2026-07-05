@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import "./style.css";
 import { createPdf } from "./pdf/pdf";
 import logoUrl from "./assets/logo.jpg";
+import FullscreenViewer from "./viewer3d";
 
 const FEEDBACK_EMAIL = "halilozer03@gmail.com";
 
@@ -351,6 +352,7 @@ function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [lang, setLang] = useState("tr");
   const [showSettings, setShowSettings] = useState(false);
+  const [showFullscreen, setShowFullscreen] = useState(false);
   const [showLangMenu, setShowLangMenu] = useState(false);
   const langMenuRef = useRef(null);
 
@@ -470,7 +472,7 @@ function App() {
   };
 
   const genelPointsReal = isGeneral ? computeGeneralPoints(segments) : [];
-  const genelPointsSvg = isGeneral ? scalePointsToBox(genelPointsReal, 900, 300, 70) : [];
+  const genelPointsSvg = isGeneral ? scalePointsToBox(genelPointsReal, 900, 340, 45) : [];
 
   // Köşebent (L) açı motoru: 90° tam L, 45° iç açı 45° olacak şekilde sol kol döner.
   // Ölçü okları her zaman büküm merkezinden kol ucuna kadar ve ilgili kola paralel kalır.
@@ -494,6 +496,29 @@ function App() {
   const bDimX2 = bx2 + bPerpX * bOff;
   const bDimY2 = by2 + bPerpY * bOff;
   const bTextX = (bDimX1 + bDimX2) / 2 + bPerpX * -18;
+
+  // 3D görünüm için: her profil türünü aynı segment zincirine çevirip tek bir
+  // kesit (cross-section) nokta dizisi üretiyoruz. Sadece görselleştirme
+  // amaçlıdır, sayısal hesaplamaları (BD, kesilecek ölçü) etkilemez.
+  const crossSection3D = isGeneral
+    ? genelPointsReal
+    : isLProfile
+      ? computeGeneralPoints([{ length: B, angle: lAngle, dir: -1 }, { length: A }])
+      : computeGeneralPoints([
+          { length: A, angle: bendAngle, dir: 1 },
+          { length: B, angle: bendAngle, dir: -1 },
+          { length: EN, angle: bendAngle, dir: -1 },
+          { length: C, angle: bendAngle, dir: 1 },
+          { length: D }
+        ]);
+  const crossSectionXs = crossSection3D.map((p) => p.x);
+  const crossSectionYs = crossSection3D.map((p) => p.y);
+  const crossSectionSize = Math.max(
+    1,
+    Math.max(...crossSectionXs) - Math.min(...crossSectionXs),
+    Math.max(...crossSectionYs) - Math.min(...crossSectionYs)
+  );
+  const extrusionDepth3D = isKapi && H > 0 ? H : crossSectionSize * 1.3;
   const bTextY = (bDimY1 + bDimY2) / 2 + bPerpY * -18;
   const arcR = 54;
   const arcEndX = cx + Math.cos(theta) * arcR;
@@ -518,6 +543,65 @@ function App() {
         {options.map((item) => <option key={item} value={item}>{labelFn ? labelFn(item) : item}</option>)}
       </select>
     </label>
+  );
+
+  const drawing2D = isLProfile ? (
+    <svg viewBox="0 0 900 360">
+      <path d={`M${bx2} ${by2} L${cx} ${cy} L${ax2} ${ay2}`} className="profile" />
+      <line x1={cx} y1={cy + 36} x2={ax2} y2={cy + 36} className="dim" />
+      <line x1={cx} y1={cy + 20} x2={cx} y2={cy + 52} className="dim" />
+      <line x1={ax2} y1={cy + 20} x2={ax2} y2={cy + 52} className="dim" />
+      <text x={(cx + ax2) / 2} y={cy + 68} className="txt">A: {A} mm</text>
+      <line x1={bDimX1} y1={bDimY1} x2={bDimX2} y2={bDimY2} className="dim" />
+      <line x1={cx} y1={cy} x2={bDimX1} y2={bDimY1} className="dimSoft" />
+      <line x1={bx2} y1={by2} x2={bDimX2} y2={bDimY2} className="dimSoft" />
+      <text x={bTextX} y={bTextY} className="txt">B: {B} mm</text>
+      <path d={`M${cx + arcR} ${cy} A${arcR} ${arcR} 0 ${arcLarge} 0 ${arcEndX} ${arcEndY}`} className="angleArc" />
+      <text x={cx + 80} y={cy - 36} className="angle">{lAngle}°</text>
+      <text x="470" y="82" className="bottom">{t.cornerSingleBend}</text>
+    </svg>
+  ) : isGeneral ? (
+    <svg viewBox="0 0 900 340">
+      <path
+        d={genelPointsSvg.length ? "M" + genelPointsSvg.map((p) => `${p.x} ${p.y}`).join(" L") : ""}
+        className="profile"
+      />
+      {genelPointsSvg.slice(0, -1).map((p, i) => {
+        const p2 = genelPointsSvg[i + 1];
+        const midX = (p.x + p2.x) / 2;
+        const midY = (p.y + p2.y) / 2;
+        return (
+          <text key={"seg" + i} x={midX} y={midY - 12} className="txt">
+            {segments[i].length} mm
+          </text>
+        );
+      })}
+      {genelPointsSvg.slice(1, -1).map((p, i) => (
+        <text key={"ang" + i} x={p.x} y={p.y - 20} className="angle">
+          {segments[i].angle ?? 90}°
+        </text>
+      ))}
+    </svg>
+  ) : (
+    <svg viewBox="0 0 900 360">
+      <path d="M160 270 L160 130 L740 130 L740 270 M160 270 L230 270 M670 270 L740 270" className="profile" />
+      <line x1="160" y1="90" x2="740" y2="90" className="dim" />
+      <text x="450" y="78" className="txt">EN: {EN} mm</text>
+      <line x1="115" y1="130" x2="115" y2="270" className="dim" />
+      <text x="70" y="205" className="txt">C: {C}</text>
+      <line x1="785" y1="130" x2="785" y2="270" className="dim" />
+      <text x="810" y="205" className="txt">D: {D}</text>
+      <line x1="160" y1="310" x2="230" y2="310" className="dim" />
+      <text x="195" y="340" className="txt">A: {A}</text>
+      <line x1="670" y1="310" x2="740" y2="310" className="dim" />
+      <text x="705" y="340" className="txt">B: {B}</text>
+      <text x="180" y="155" className="angle">90°</text>
+      <text x="180" y="250" className="angle">90°</text>
+      <text x="705" y="155" className="angle">90°</text>
+      <text x="705" y="250" className="angle">90°</text>
+      <line x1="160" y1="270" x2="340" y2="160" className="profile" />
+      <text x="230" y="190" className="txt" transform="rotate(-31.4 230 190)">{t.lengthWord}: {H} mm</text>
+    </svg>
   );
 
   if (showSplash) {
@@ -698,160 +782,11 @@ function App() {
 
       <section className="panel">
         <h2>{t.draw}</h2>
-        <div className="drawingBox">
-          {isLProfile ? (
-            <svg viewBox="0 0 900 360">
-              <path d={`M${bx2} ${by2} L${cx} ${cy} L${ax2} ${ay2}`} className="profile" />
-
-              {/* A ölçüsü: büküm merkezinden sağ uca, yatay kola paralel */}
-              <line x1={cx} y1={cy + 36} x2={ax2} y2={cy + 36} className="dim" />
-              <line x1={cx} y1={cy + 20} x2={cx} y2={cy + 52} className="dim" />
-              <line x1={ax2} y1={cy + 20} x2={ax2} y2={cy + 52} className="dim" />
-              <text x={(cx + ax2) / 2} y={cy + 68} className="txt">A: {A} mm</text>
-
-              {/* B ölçüsü: büküm merkezinden sol kol ucuna, kola paralel */}
-              <line x1={bDimX1} y1={bDimY1} x2={bDimX2} y2={bDimY2} className="dim" />
-              <line x1={cx} y1={cy} x2={bDimX1} y2={bDimY1} className="dimSoft" />
-              <line x1={bx2} y1={by2} x2={bDimX2} y2={bDimY2} className="dimSoft" />
-              <text x={bTextX} y={bTextY} className="txt">B: {B} mm</text>
-
-              {/* İç açı */}
-              <path d={`M${cx + arcR} ${cy} A${arcR} ${arcR} 0 ${arcLarge} 0 ${arcEndX} ${arcEndY}`} className="angleArc" />
-              <text x={cx + 80} y={cy - 36} className="angle">{lAngle}°</text>
-              <text x="470" y="82" className="bottom">{t.cornerSingleBend}</text>
-            </svg>
-          ) : isGeneral ? (
-            <svg viewBox="0 0 900 300">
-              <path
-                d={genelPointsSvg.length ? "M" + genelPointsSvg.map((p) => `${p.x} ${p.y}`).join(" L") : ""}
-                className="profile"
-              />
-              {genelPointsSvg.slice(0, -1).map((p, i) => {
-                const p2 = genelPointsSvg[i + 1];
-                const midX = (p.x + p2.x) / 2;
-                const midY = (p.y + p2.y) / 2;
-                return (
-                  <text key={"seg" + i} x={midX} y={midY - 12} className="txt">
-                    {segments[i].length} mm
-                  </text>
-                );
-              })}
-              {genelPointsSvg.slice(1, -1).map((p, i) => (
-                <text key={"ang" + i} x={p.x} y={p.y - 20} className="angle">
-                  {segments[i].angle ?? 90}°
-                </text>
-              ))}
-            </svg>
-          ) : (
-            <svg viewBox="0 0 900 360">
-              <path d="M160 270 L160 130 L740 130 L740 270 M160 270 L230 270 M670 270 L740 270" className="profile" />
-              <line x1="160" y1="90" x2="740" y2="90" className="dim" />
-              <text x="450" y="78" className="txt">EN: {EN} mm</text>
-              <line x1="115" y1="130" x2="115" y2="270" className="dim" />
-              <text x="70" y="205" className="txt">C: {C}</text>
-              <line x1="785" y1="130" x2="785" y2="270" className="dim" />
-              <text x="810" y="205" className="txt">D: {D}</text>
-              <line x1="160" y1="310" x2="230" y2="310" className="dim" />
-              <text x="195" y="340" className="txt">A: {A}</text>
-              <line x1="670" y1="310" x2="740" y2="310" className="dim" />
-              <text x="705" y="340" className="txt">B: {B}</text>
-              <text x="180" y="155" className="angle">90°</text>
-              <text x="180" y="250" className="angle">90°</text>
-              <text x="705" y="155" className="angle">90°</text>
-              <text x="705" y="250" className="angle">90°</text>
-
-              {/* BOY (uzunluk) ölçü çizgisi: A'nın iç köşesinden (dikey kolla
-                  birleştiği nokta) parçanın ortasına doğru, profil çizgisiyle
-                  aynı kalınlıkta çizilir. Yazı çizgiye paralel döner. */}
-              <line x1="160" y1="270" x2="340" y2="160" className="profile" />
-              <text x="230" y="190" className="txt" transform="rotate(-31.4 230 190)">{t.lengthWord}: {H} mm</text>
-            </svg>
-          )}
+        <div className="drawingBox" onClick={() => setShowFullscreen(true)} role="button">
+          <div className="fsOpenHint">🔍</div>
+          {drawing2D}
         </div>
       </section>
-
-      {!isGeneral && (
-      <section className="panel">
-        <h2>{t.view3d} <small className="badge">{t.lockedBadge}</small></h2>
-        <div className="view3dBox">
-          {isLProfile ? (
-            <svg viewBox="0 0 900 430" className="iso3d">
-              <defs>
-                <linearGradient id="lMetalFace" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stopColor="#f3f4f5"/>
-                  <stop offset="0.45" stopColor="#9aa1a8"/>
-                  <stop offset="1" stopColor="#373c43"/>
-                </linearGradient>
-                <linearGradient id="lMetalDark" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stopColor="#cfd3d7"/>
-                  <stop offset="1" stopColor="#2a2f36"/>
-                </linearGradient>
-              </defs>
-              {(() => {
-                const ox = 290, oy = 295;
-                const sc = Math.min(6.2, 430 / Math.max(1, A), 190 / Math.max(1, B));
-                const ex = ox + A * sc;
-                const ey = oy;
-                const tx = ox + Math.cos(theta) * B * sc;
-                const ty = oy - Math.sin(theta) * B * sc;
-                const depthX = 58, depthY = -34;
-                const strip = 18;
-                return (
-                  <>
-                    <polygon points={`${ox},${oy} ${ex},${ey} ${ex + depthX},${ey + depthY} ${ox + depthX},${oy + depthY}`} fill="url(#lMetalFace)" stroke="#e5e7eb" strokeWidth="3" />
-                    <polygon points={`${ox},${oy} ${tx},${ty} ${tx + depthX},${ty + depthY} ${ox + depthX},${oy + depthY}`} fill="url(#lMetalDark)" stroke="#e5e7eb" strokeWidth="3" />
-                    <polygon points={`${ox},${oy} ${ox + depthX},${oy + depthY} ${ox + depthX + strip},${oy + depthY + 18} ${ox + strip},${oy + 18}`} fill="url(#lMetalFace)" opacity="0.55" stroke="#cfd3d9" strokeWidth="2" />
-                    <line x1={ox} y1={oy + 45} x2={ex} y2={ey + 45} className="dim3d" />
-                    <line x1={ox} y1={oy + 28} x2={ox} y2={oy + 62} className="dim3d" />
-                    <line x1={ex} y1={ey + 28} x2={ex} y2={ey + 62} className="dim3d" />
-                    <text x={(ox + ex) / 2} y={oy + 80} className="txt3d">A: {A}</text>
-                    <line x1={ox - 45} y1={oy} x2={tx - 45} y2={ty} className="dim3d" />
-                    <text x={(ox + tx) / 2 - 82} y={(oy + ty) / 2} className="txt3d">B: {B}</text>
-                    <path d={`M${ox + 58} ${oy} A58 58 0 0 0 ${ox + Math.cos(theta) * 58} ${oy - Math.sin(theta) * 58}`} className="angleArc" />
-                    <text x={ox + 82} y={oy - 42} className="txt3d">{lAngle}°</text>
-                    <text x="450" y="400" className="bottom3d">{t.cornerSingleBend}</text>
-                  </>
-                );
-              })()}
-            </svg>
-          ) : (
-          <svg viewBox="0 0 900 430" className="iso3d">
-            <defs>
-              <linearGradient id="metalFace" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stopColor="#f3f4f5"/>
-                <stop offset="0.45" stopColor="#9aa1a8"/>
-                <stop offset="1" stopColor="#373c43"/>
-              </linearGradient>
-              <linearGradient id="metalDark" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stopColor="#cfd3d7"/>
-                <stop offset="1" stopColor="#2a2f36"/>
-              </linearGradient>
-            </defs>
-
-            {/* V114 geometri kilitli: sadece ayarlar sistemi eklendi */}
-            <polygon points="220,285 650,285 720,235 290,235" fill="url(#metalFace)" stroke="#e5e7eb" strokeWidth="3"/>
-            <polygon points="220,285 290,235 290,135 220,185" fill="url(#metalDark)" stroke="#e5e7eb" strokeWidth="3"/>
-            <polygon points="650,285 720,235 720,135 650,185" fill="url(#metalDark)" stroke="#e5e7eb" strokeWidth="3"/>
-            <polygon points="290,135 720,135 650,185 220,185" fill="url(#metalFace)" opacity="0.18" stroke="#cfd3d9" strokeWidth="2"/>
-            <polygon points="290,135 360,135 290,185 220,185" fill="url(#metalFace)" stroke="#e5e7eb" strokeWidth="3"/>
-            <polygon points="650,185 720,135 650,135 580,185" fill="url(#metalFace)" stroke="#e5e7eb" strokeWidth="3"/>
-
-            <line x1="220" y1="320" x2="650" y2="320" className="dim3d"/>
-            <text x="435" y="350" className="txt3d">EN: {EN}</text>
-            <line x1="180" y1="185" x2="180" y2="285" className="dim3d"/>
-            <text x="145" y="240" className="txt3d">C: {C}</text>
-            <line x1="760" y1="135" x2="760" y2="235" className="dim3d"/>
-            <text x="800" y="190" className="txt3d">D: {D}</text>
-            <line x1="240" y1="115" x2="320" y2="115" className="dim3d"/>
-            <text x="280" y="96" className="txt3d">A: {A}</text>
-            <line x1="590" y1="115" x2="670" y2="115" className="dim3d"/>
-            <text x="630" y="96" className="txt3d">B: {B}</text>
-            <text x="450" y="392" className="bottom3d">A • B • C • D • EN • {t.lengthWord}</text>
-          </svg>
-          )}
-        </div>
-      </section>
-      )}
 
       <div className="actions">
         <button type="button" onClick={() => createPdf({ data, result, lang, action: "save" })}>{t.pdf}</button>
@@ -871,6 +806,16 @@ function App() {
           {t.feedbackBtn}
         </button>
       </div>
+
+      {showFullscreen && (
+        <FullscreenViewer
+          points={crossSection3D}
+          thickness={thickness}
+          depth={extrusionDepth3D}
+          svgContent={drawing2D}
+          onClose={() => setShowFullscreen(false)}
+        />
+      )}
     </main>
   );
 }

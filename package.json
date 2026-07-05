@@ -19,7 +19,8 @@
     "vite": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "jspdf": "latest"
+    "jspdf": "latest",
+    "three": "latest"
   },
   "devDependencies": {
     "@capacitor/cli": "7.4.3",
