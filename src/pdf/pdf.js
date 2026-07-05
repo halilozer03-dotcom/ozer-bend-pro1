@@ -634,12 +634,17 @@ async function createPdfInner({ data, result, lang = "tr", action = "save" }) {
   // Logo ve başlık.
   doc.setFont("helvetica", "bold");
   doc.setFontSize(25);
-  doc.setTextColor(0, 0, 0);
-  doc.text("ÖZER", 96, 18);
-  doc.setTextColor(...red);
-  doc.text("BEND", 133, 18);
-  doc.setTextColor(0, 0, 0);
-  doc.text("PRO", 174, 18);
+  if (data && data.companyName && data.companyName.trim()) {
+    doc.setTextColor(0, 0, 0);
+    doc.text(data.companyName.trim(), 148.5, 18, { align: "center" });
+  } else {
+    doc.setTextColor(0, 0, 0);
+    doc.text("ÖZER", 96, 18);
+    doc.setTextColor(...red);
+    doc.text("BEND", 133, 18);
+    doc.setTextColor(0, 0, 0);
+    doc.text("PRO", 174, 18);
+  }
   doc.setFont("helvetica", "normal");
   doc.setFontSize(7.2);
   doc.setTextColor(80, 80, 80);

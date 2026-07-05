@@ -849,6 +849,18 @@ function App() {
     } catch (e) {}
   }, [lang]);
   const [showSettings, setShowSettings] = useState(false);
+  const [companyName, setCompanyName] = useState(() => {
+    try {
+      const saved = localStorage.getItem("ozerbend_company");
+      if (saved) return saved;
+    } catch (e) {}
+    return "";
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem("ozerbend_company", companyName);
+    } catch (e) {}
+  }, [companyName]);
   const [showFullscreen, setShowFullscreen] = useState(false);
   const [showLangMenu, setShowLangMenu] = useState(false);
   const langMenuRef = useRef(null);
@@ -987,7 +999,7 @@ function App() {
   // ekstra düşüm uygulanmaz, sadece büküm başına BD çıkarılır.
   const kesilecekEn = isKapi ? total - bdToplam - deduct : total - bdToplam;
   const kesilecekBoy = isKapi ? H - deduct : null;
-  const data = { profileType, A, B, C, D, EN, H, bd, deduct, material, kalip: lowerDie, upperDie, machine, thickness, aci: bendAngle, icR: insideR, bendCount, segments: isGeneral ? segments : undefined };
+  const data = { profileType, A, B, C, D, EN, H, bd, deduct, material, kalip: lowerDie, upperDie, machine, thickness, aci: bendAngle, icR: insideR, bendCount, segments: isGeneral ? segments : undefined, companyName };
   const materialDensityGCm3 = MATERIAL_DENSITY[material] ?? 7.85;
   const weightKg = isKapi && kesilecekBoy != null
     ? (kesilecekEn * kesilecekBoy * Number(thickness) * materialDensityGCm3) / 1e6
@@ -1316,6 +1328,14 @@ function App() {
         <section className="panel settingsPanel">
           <h2>{t.settings}</h2>
           <div className="grid">
+            <label>Firma Adı (PDF başlığında görünür)
+              <input
+                type="text"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                placeholder="ÖZER BEND PRO"
+              />
+            </label>
             {select(t.machineLabel, machine, setMachine, machines)}
             {select(t.lowerDieLabel, lowerDie, setLowerDie, lowerDies)}
             {select(t.upperDieLabel, upperDie, setUpperDie, upperDies)}
