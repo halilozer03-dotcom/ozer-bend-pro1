@@ -895,6 +895,56 @@ function App() {
   const [manualBdValue, setManualBdValue] = useState(3.30);
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false);
+  const [history, setHistory] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("ozerbend_history");
+      if (raw) setHistory(JSON.parse(raw));
+    } catch (e) {}
+  }, []);
+
+  const persistHistory = (list) => {
+    setHistory(list);
+    try {
+      localStorage.setItem("ozerbend_history", JSON.stringify(list));
+    } catch (e) {}
+  };
+
+  const pushHistoryEntry = () => {
+    const entry = {
+      id: Date.now(),
+      profileType, A, B, C, D, EN, H,
+      segments: isGeneral ? segments : undefined,
+      material, thickness, bendAngle, insideR, deduct, manualBd, manualBdValue,
+    };
+    setHistory((prev) => {
+      const next = [entry, ...prev].slice(0, 15);
+      try {
+        localStorage.setItem("ozerbend_history", JSON.stringify(next));
+      } catch (e) {}
+      return next;
+    });
+  };
+
+  const applyHistoryEntry = (item) => {
+    setProfileType(item.profileType);
+    setA(item.A); setB(item.B); setC(item.C); setD(item.D); setEN(item.EN); setH(item.H);
+    if (item.segments) setSegments(item.segments);
+    setMaterial(item.material); setThickness(item.thickness);
+    setBendAngle(item.bendAngle); setInsideR(item.insideR);
+    setDeduct(item.deduct); setManualBd(item.manualBd); setManualBdValue(item.manualBdValue);
+    setShowHistory(false);
+  };
+
+  const deleteHistoryEntry = (id) => {
+    persistHistory(history.filter((h) => h.id !== id));
+  };
+
+  const clearHistoryAll = () => {
+    persistHistory([]);
+  };
 
   useEffect(() => {
     try {
@@ -1447,6 +1497,7 @@ function App() {
         <div className="favWrap">
           <button type="button" className="favBtn" onClick={() => setShowFavorites(!showFavorites)}>⭐ {t.favorites}</button>
           <button type="button" className="favBtn" onClick={saveFavorite}>💾 {t.favSave}</button>
+                <button type="button" className="favBtn" onClick={() => setShowHistory(!showHistory)}>🕘 Geçmiş</button>
         </div>
       </div>
       {showFavorites && (
@@ -1466,7 +1517,27 @@ function App() {
           )}
         </div>
       )}
-        {isGeneral ? (
+        {showHistory && (
+        <div className="favPanel">
+          {history.length === 0 ? (
+            <p className="favEmpty">Henüz geçmiş işlem yok.</p>
+          ) : (
+            <>
+              {history.map((item) => (
+                <div className="favRow" key={item.id}>
+                  <span>{new Date(item.id).toLocaleString()} — {item.profileType === "kapi" ? "Kapı" : item.profileType === "l" ? "Köşebent" : "Genel"}</span>
+                  <div>
+                    <button type="button" onClick={() => applyHistoryEntry(item)}>Yükle</button>
+                    <button type="button" onClick={() => deleteHistoryEntry(item.id)}>Sil</button>
+                  </div>
+                </div>
+              ))}
+              <button type="button" onClick={clearHistoryAll} style={{ width: "100%", marginTop: 8 }}>Tümünü Temizle</button>
+            </>
+          )}
+        </div>
+      )}
+      {isGeneral ? (
           <div className="segmentEditor">
             {segments.map((seg, i) => (
               <div className="segmentRow" key={i}>
