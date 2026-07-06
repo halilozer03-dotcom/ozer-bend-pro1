@@ -7,7 +7,10 @@ const MATERIALS = [
   { code: "INOX 316", label: "INOX 316", density: 8.00 },
   { code: "Aluminyum 1050", label: "Alüminyum 1050", density: 2.71 },
   { code: "Aluminyum 5754", label: "Alüminyum 5754", density: 2.66 },
-  { code: "Hardox", label: "Hardox", density: 7.85 }
+  { code: "Hardox", label: "Hardox", density: 7.85 },
+  { code: "Pirinc", label: "Pirinç", density: 8.50 },
+  { code: "Bronz", label: "Bronz", density: 8.80 },
+  { code: "Bakir", label: "Bakır", density: 8.96 }
 ];
 
 const fieldStyle = {
