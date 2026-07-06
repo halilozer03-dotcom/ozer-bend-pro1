@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import "./style.css";
 import { createPdf } from "./pdf/pdf";
 import FreeDrawCanvas from "./freedraw";
+import WeightCalc from "./weightcalc";
 import logoUrl from "./assets/logo.jpg";
 import FullscreenViewer from "./viewer3d";
 
@@ -867,6 +868,7 @@ function App() {
 
   const [profileType, setProfileType] = useState("kapi");
   const [freeDrawOpen, setFreeDrawOpen] = useState(false);
+  const [weightCalcOpen, setWeightCalcOpen] = useState(false);
 
   const [A, setA] = useState(20);
   const [B, setB] = useState(20);
@@ -1406,6 +1408,24 @@ function App() {
         >
           Serbest Çizim
         </button>
+        <button
+          type="button"
+          onClick={() => setWeightCalcOpen(true)}
+          style={{
+            width: "100%",
+            marginTop: 10,
+            padding: "14px 18px",
+            borderRadius: 12,
+            border: "1px solid rgba(207,213,218,.35)",
+            background: "#1b2129",
+            color: "#eef1f3",
+            fontWeight: 700,
+            fontSize: 16
+          }}
+        >
+          ⚖️ Ağırlık Hesapla
+        </button>
+        {weightCalcOpen && <WeightCalc onClose={() => setWeightCalcOpen(false)} />}
       </section>
 
       {freeDrawOpen && (
