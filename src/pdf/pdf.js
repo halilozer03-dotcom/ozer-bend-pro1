@@ -703,7 +703,7 @@ async function createPdfInner({ data, result, lang = "tr", action = "save" }) {
             nx = -nx;
             ny = -ny;
           }
-          const offset = 20;
+          const offset = 14;
           const labelX = midX + nx * offset;
           const labelY = midY + ny * offset;
           let angleDeg = Math.atan2(dy, dx) * 180 / Math.PI;
