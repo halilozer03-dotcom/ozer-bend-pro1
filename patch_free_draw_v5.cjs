@@ -1,4 +1,19 @@
-import React, { useRef, useState, useCallback, useEffect } from "react";
+// patch_free_draw_v5.cjs
+// 1) Yatay mod zorunlulugu kaldirilir - Serbest Cizim artik hem dikey hem
+//    yatay modda calisir (kilitlenmez, kullanicinin telefon yonune uyar).
+// 2) Cizim alani artik EKRANIN GERCEK ORANINA gore olcekleniyor (dinamik
+//    viewBox) - onceden kare varsayildigi icin dikey modda bosluk/hizasizlik
+//    oluyordu, artik tam ekrani dolduruyor, buton/etiketler dogru hizada.
+// 3) Buku yonu (dir) isareti ters cevrildi - cizilen sekil ile 3D/Genel
+//    Profil'e aktarilan sekil artik ayna gibi ters degil, cizdigin gibi
+//    goruntuleniyor.
+
+const fs = require("fs");
+const path = require("path");
+
+const FREEDRAW_JSX = path.join(process.cwd(), "src", "freedraw.jsx");
+
+const FREEDRAW_CONTENT = `import React, { useRef, useState, useCallback, useEffect } from "react";
 
 const GRID_MM = 5;
 const ANGLE_STEP = 15;
@@ -262,25 +277,25 @@ export default function FreeDrawCanvas({ maxSegments, onCommit, onClose }) {
     const maxY = vbY + vbH - labelH / 2 - 4;
     lx = Math.min(maxX, Math.max(minX, lx));
     ly = Math.min(maxY, Math.max(minY, ly));
-    liveLabel = { x: lx, y: ly, w: labelW, h: labelH, text: `${len} mm  •  ${angleDeg}°` };
+    liveLabel = { x: lx, y: ly, w: labelW, h: labelH, text: \`\${len} mm  •  \${angleDeg}°\` };
   }
 
   const gridStep = gridStepFor(viewSize);
   const gridLines = [];
   for (let g = Math.floor(vbX / gridStep) * gridStep; g <= vbX + vbW; g += gridStep) {
     gridLines.push(
-      <line key={`v${g}`} x1={g} y1={vbY} x2={g} y2={vbY + vbH} stroke="rgba(255,255,255,0.10)" strokeWidth={viewSize / 300} />
+      <line key={\`v\${g}\`} x1={g} y1={vbY} x2={g} y2={vbY + vbH} stroke="rgba(255,255,255,0.10)" strokeWidth={viewSize / 300} />
     );
   }
   for (let g = Math.floor(vbY / gridStep) * gridStep; g <= vbY + vbH; g += gridStep) {
     gridLines.push(
-      <line key={`h${g}`} x1={vbX} y1={g} x2={vbX + vbW} y2={g} stroke="rgba(255,255,255,0.10)" strokeWidth={viewSize / 300} />
+      <line key={\`h\${g}\`} x1={vbX} y1={g} x2={vbX + vbW} y2={g} stroke="rgba(255,255,255,0.10)" strokeWidth={viewSize / 300} />
     );
   }
 
   const pathD =
     points.length > 0
-      ? points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ")
+      ? points.map((p, i) => \`\${i === 0 ? "M" : "L"} \${p.x} \${p.y}\`).join(" ")
       : "";
 
   const strokeW = Math.max(1, viewSize / 60);
@@ -291,7 +306,7 @@ export default function FreeDrawCanvas({ maxSegments, onCommit, onClose }) {
       {/* Cizim alani - ekranin gercek oranina gore olcekli, butonlar disinda TUM ekran */}
       <svg
         ref={svgRef}
-        viewBox={`${vbX} ${vbY} ${vbW} ${vbH}`}
+        viewBox={\`\${vbX} \${vbY} \${vbW} \${vbH}\`}
         preserveAspectRatio="none"
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block", touchAction: "none" }}
         onPointerDown={handlePointerDown}
@@ -304,13 +319,13 @@ export default function FreeDrawCanvas({ maxSegments, onCommit, onClose }) {
         <line x1={0} y1={vbY} x2={0} y2={vbY + vbH} stroke="rgba(255,255,255,0.18)" strokeWidth={viewSize / 250} />
         {pathD && <path d={pathD} stroke="#c4cad2" strokeWidth={strokeW} fill="none" strokeLinecap="round" strokeLinejoin="round" />}
         {drag && anchorPoint && (
-          <line x1={anchorPoint.x} y1={anchorPoint.y} x2={drag.x} y2={drag.y} stroke="#ffd35a" strokeWidth={strokeW} strokeDasharray={`${strokeW * 2.4} ${strokeW * 1.6}`} />
+          <line x1={anchorPoint.x} y1={anchorPoint.y} x2={drag.x} y2={drag.y} stroke="#ffd35a" strokeWidth={strokeW} strokeDasharray={\`\${strokeW * 2.4} \${strokeW * 1.6}\`} />
         )}
         {points.map((p, i) => (
           <circle key={i} cx={p.x} cy={p.y} r={dotR} fill={i === 0 ? "#ffd35a" : "#c4cad2"} />
         ))}
         {liveLabel && (
-          <g transform={`translate(${liveLabel.x}, ${liveLabel.y})`}>
+          <g transform={\`translate(\${liveLabel.x}, \${liveLabel.y})\`}>
             <rect x={-liveLabel.w / 2} y={-liveLabel.h / 2} width={liveLabel.w} height={liveLabel.h} rx={viewSize * 0.02} fill="rgba(0,0,0,0.82)" />
             <text x={0} y={viewSize * 0.012} textAnchor="middle" fill="#ffd35a" fontSize={viewSize * 0.05} fontWeight={800}>{liveLabel.text}</text>
           </g>
@@ -369,3 +384,10 @@ export default function FreeDrawCanvas({ maxSegments, onCommit, onClose }) {
     </div>
   );
 }
+`;
+
+fs.writeFileSync(FREEDRAW_JSX, FREEDRAW_CONTENT, "utf8");
+console.log("[OK] src/freedraw.jsx guncellendi (v5 - dikey+yatay destegi, dogru oran, duzeltilmis buku yonu)");
+
+console.log("\n✅ SERBEST CIZIM V5 BASARIYLA UYGULANDI.");
+console.log("Simdi: git add -A && git commit -m \"Serbest Cizim v5: dikey mod destegi + dogru oran + buku yonu duzeltmesi\" && git push -u origin main");
