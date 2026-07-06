@@ -1,4 +1,39 @@
-import React, { useRef, useState, useCallback, useEffect } from "react";
+// patch_free_draw_v4.cjs
+// 1) package.json'a @capacitor/screen-orientation eklenir (workflow her
+//    derlemede "cap add android" + "cap sync android" calistirdigi icin
+//    native tarafi elle duzenlemeye gerek yok).
+// 2) freedraw.jsx: acilinca yatay moda kilitler, kapaninca serbest birakir.
+// 3) Iki parmakla pinch-zoom eklenir (tek parmak = cizim, iki parmak = zoom).
+// 4) Ust bar kaldirilir, sadece kucuk yuzen bir rozet (segment sayaci) ve
+//    yuzen kapat (X) butonu kalir - butonlar disinda TUM ekran cizim sahasi.
+// 5) Canli olcum etiketi artik ekran/viewBox sinirlarinin icinde kalacak
+//    sekilde konum kirpma (clamp) yapiliyor - disari tasmiyor.
+
+const fs = require("fs");
+const path = require("path");
+
+const PACKAGE_JSON = path.join(process.cwd(), "package.json");
+const FREEDRAW_JSX = path.join(process.cwd(), "src", "freedraw.jsx");
+
+/* ---------------------------------------------------------------------
+   1) package.json: yeni bagimlilik ekle
+--------------------------------------------------------------------- */
+
+const pkg = JSON.parse(fs.readFileSync(PACKAGE_JSON, "utf8"));
+if (!pkg.dependencies) pkg.dependencies = {};
+if (!pkg.dependencies["@capacitor/screen-orientation"]) {
+  pkg.dependencies["@capacitor/screen-orientation"] = "^7.0.0";
+  fs.writeFileSync(PACKAGE_JSON, JSON.stringify(pkg, null, 2) + "\n", "utf8");
+  console.log("[OK] @capacitor/screen-orientation package.json'a eklendi");
+} else {
+  console.log("[BILGI] @capacitor/screen-orientation zaten package.json'da vardi");
+}
+
+/* ---------------------------------------------------------------------
+   2) freedraw.jsx: tamamen yeniden yaz
+--------------------------------------------------------------------- */
+
+const FREEDRAW_CONTENT = `import React, { useRef, useState, useCallback, useEffect } from "react";
 
 const GRID_MM = 5;
 const ANGLE_STEP = 15;
@@ -251,23 +286,23 @@ export default function FreeDrawCanvas({ maxSegments, onCommit, onClose }) {
     const maxY = vbY + viewSize - labelH / 2 - 4;
     lx = Math.min(maxX, Math.max(minX, lx));
     ly = Math.min(maxY, Math.max(minY, ly));
-    liveLabel = { x: lx, y: ly, w: labelW, h: labelH, text: `${len} mm  •  ${angleDeg}°` };
+    liveLabel = { x: lx, y: ly, w: labelW, h: labelH, text: \`\${len} mm  •  \${angleDeg}°\` };
   }
 
   const gridStep = gridStepFor(viewSize);
   const gridLines = [];
   for (let g = Math.floor(vbX / gridStep) * gridStep; g <= half; g += gridStep) {
     gridLines.push(
-      <line key={`v${g}`} x1={g} y1={vbY} x2={g} y2={half} stroke="rgba(255,255,255,0.10)" strokeWidth={viewSize / 300} />
+      <line key={\`v\${g}\`} x1={g} y1={vbY} x2={g} y2={half} stroke="rgba(255,255,255,0.10)" strokeWidth={viewSize / 300} />
     );
     gridLines.push(
-      <line key={`h${g}`} x1={vbX} y1={g} x2={half} y2={g} stroke="rgba(255,255,255,0.10)" strokeWidth={viewSize / 300} />
+      <line key={\`h\${g}\`} x1={vbX} y1={g} x2={half} y2={g} stroke="rgba(255,255,255,0.10)" strokeWidth={viewSize / 300} />
     );
   }
 
   const pathD =
     points.length > 0
-      ? points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ")
+      ? points.map((p, i) => \`\${i === 0 ? "M" : "L"} \${p.x} \${p.y}\`).join(" ")
       : "";
 
   const strokeW = Math.max(1, viewSize / 60);
@@ -278,7 +313,7 @@ export default function FreeDrawCanvas({ maxSegments, onCommit, onClose }) {
       {/* Cizim alani - butonlar disinda TUM ekran */}
       <svg
         ref={svgRef}
-        viewBox={`${vbX} ${vbY} ${viewSize} ${viewSize}`}
+        viewBox={\`\${vbX} \${vbY} \${viewSize} \${viewSize}\`}
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block", touchAction: "none" }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
@@ -290,13 +325,13 @@ export default function FreeDrawCanvas({ maxSegments, onCommit, onClose }) {
         <line x1={0} y1={vbY} x2={0} y2={half} stroke="rgba(255,255,255,0.18)" strokeWidth={viewSize / 250} />
         {pathD && <path d={pathD} stroke="#c4cad2" strokeWidth={strokeW} fill="none" strokeLinecap="round" strokeLinejoin="round" />}
         {drag && anchorPoint && (
-          <line x1={anchorPoint.x} y1={anchorPoint.y} x2={drag.x} y2={drag.y} stroke="#ffd35a" strokeWidth={strokeW} strokeDasharray={`${strokeW * 2.4} ${strokeW * 1.6}`} />
+          <line x1={anchorPoint.x} y1={anchorPoint.y} x2={drag.x} y2={drag.y} stroke="#ffd35a" strokeWidth={strokeW} strokeDasharray={\`\${strokeW * 2.4} \${strokeW * 1.6}\`} />
         )}
         {points.map((p, i) => (
           <circle key={i} cx={p.x} cy={p.y} r={dotR} fill={i === 0 ? "#ffd35a" : "#c4cad2"} />
         ))}
         {liveLabel && (
-          <g transform={`translate(${liveLabel.x}, ${liveLabel.y})`}>
+          <g transform={\`translate(\${liveLabel.x}, \${liveLabel.y})\`}>
             <rect x={-liveLabel.w / 2} y={-liveLabel.h / 2} width={liveLabel.w} height={liveLabel.h} rx={viewSize * 0.02} fill="rgba(0,0,0,0.82)" />
             <text x={0} y={viewSize * 0.012} textAnchor="middle" fill="#ffd35a" fontSize={viewSize * 0.05} fontWeight={800}>{liveLabel.text}</text>
           </g>
@@ -355,3 +390,10 @@ export default function FreeDrawCanvas({ maxSegments, onCommit, onClose }) {
     </div>
   );
 }
+`;
+
+fs.writeFileSync(FREEDRAW_JSX, FREEDRAW_CONTENT, "utf8");
+console.log("[OK] src/freedraw.jsx guncellendi (v4 - yatay mod, pinch-zoom, tam ekran, sinir-ici etiket)");
+
+console.log("\n✅ SERBEST CIZIM V4 BASARIYLA UYGULANDI.");
+console.log("Simdi: git add -A && git commit -m \"Serbest Cizim v4: yatay mod + pinch-zoom + tam ekran + sinirli etiket\" && git push -u origin main");
