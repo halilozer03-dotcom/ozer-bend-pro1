@@ -23,6 +23,11 @@ jobs:
           distribution: temurin
           java-version: 21
 
+      - name: Use fixed debug keystore (consistent signing across builds)
+        run: |
+          mkdir -p ~/.android
+          cp keystore/ozerbend-debug.keystore ~/.android/debug.keystore
+
       - name: Install dependencies
         run: npm install
 

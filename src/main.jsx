@@ -1411,6 +1411,7 @@ function App() {
       {freeDrawOpen && (
         <FreeDrawCanvas
           maxSegments={15}
+          lang={lang}
           onClose={() => setFreeDrawOpen(false)}
           onCommit={(segs) => {
             setSegments(segs);

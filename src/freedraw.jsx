@@ -27,6 +27,21 @@ function gridStepFor(viewSize) {
   return 250;
 }
 
+
+const FREE_DRAW_I18N = {
+  tr: { title: "Serbest Çizim", hint: "Ekrana dokunup sürükleyerek ilk çizgiyi çiz. İki parmakla yakınlaştır/uzaklaştır.", zoomOut: "− Uzaklaştır", zoomIn: "+ Yakınlaştır", angleOn: "15° Açı: Açık", angleOff: "15° Açı: Kapalı", undo: "Geri Al", resetBtn: "Sıfırla", apply: "Uygula ✓" },
+  en: { title: "Free Draw", hint: "Touch and drag to draw the first line. Pinch with two fingers to zoom.", zoomOut: "− Zoom Out", zoomIn: "+ Zoom In", angleOn: "15° Snap: On", angleOff: "15° Snap: Off", undo: "Undo", resetBtn: "Reset", apply: "Apply ✓" },
+  fr: { title: "Dessin Libre", hint: "Touchez et faites glisser pour dessiner la première ligne. Pincez avec deux doigts pour zoomer.", zoomOut: "− Zoom arrière", zoomIn: "+ Zoom avant", angleOn: "Angle 15° : Activé", angleOff: "Angle 15° : Désactivé", undo: "Annuler", resetBtn: "Réinitialiser", apply: "Appliquer ✓" },
+  de: { title: "Freihandzeichnung", hint: "Berühren und ziehen, um die erste Linie zu zeichnen. Mit zwei Fingern zoomen.", zoomOut: "− Verkleinern", zoomIn: "+ Vergrößern", angleOn: "15°-Raster: Ein", angleOff: "15°-Raster: Aus", undo: "Rückgängig", resetBtn: "Zurücksetzen", apply: "Anwenden ✓" },
+  es: { title: "Dibujo Libre", hint: "Toca y arrastra para dibujar la primera línea. Pellizca con dos dedos para hacer zoom.", zoomOut: "− Alejar", zoomIn: "+ Acercar", angleOn: "Ángulo 15°: Activado", angleOff: "Ángulo 15°: Desactivado", undo: "Deshacer", resetBtn: "Reiniciar", apply: "Aplicar ✓" },
+  it: { title: "Disegno Libero", hint: "Tocca e trascina per disegnare la prima linea. Pizzica con due dita per zoomare.", zoomOut: "− Riduci", zoomIn: "+ Ingrandisci", angleOn: "Angolo 15°: Attivo", angleOff: "Angolo 15°: Disattivo", undo: "Annulla", resetBtn: "Reimposta", apply: "Applica ✓" },
+  ru: { title: "Свободное рисование", hint: "Коснитесь и проведите, чтобы нарисовать первую линию. Сведите два пальца для масштабирования.", zoomOut: "− Уменьшить", zoomIn: "+ Увеличить", angleOn: "Угол 15°: Вкл", angleOff: "Угол 15°: Выкл", undo: "Отменить", resetBtn: "Сбросить", apply: "Применить ✓" },
+  pt: { title: "Desenho Livre", hint: "Toque e arraste para desenhar a primeira linha. Belisque com dois dedos para ampliar.", zoomOut: "− Diminuir", zoomIn: "+ Ampliar", angleOn: "Ângulo 15°: Ativado", angleOff: "Ângulo 15°: Desativado", undo: "Desfazer", resetBtn: "Reiniciar", apply: "Aplicar ✓" },
+  pl: { title: "Rysowanie Odręczne", hint: "Dotknij i przeciągnij, aby narysować pierwszą linię. Uszczypnij dwoma palcami, aby powiększyć.", zoomOut: "− Oddal", zoomIn: "+ Przybliż", angleOn: "Kąt 15°: Wł.", angleOff: "Kąt 15°: Wył.", undo: "Cofnij", resetBtn: "Resetuj", apply: "Zastosuj ✓" },
+  zh: { title: "自由绘图", hint: "触摸并拖动以绘制第一条线。双指捏合可缩放。", zoomOut: "− 缩小", zoomIn: "+ 放大", angleOn: "15°角度：开", angleOff: "15°角度：关", undo: "撤销", resetBtn: "重置", apply: "应用 ✓" },
+  ar: { title: "رسم حر", hint: "المس واسحب لرسم الخط الأول. اقرص بإصبعين للتكبير.", zoomOut: "− تصغير", zoomIn: "+ تكبير", angleOn: "زاوية 15°: مفعلة", angleOff: "زاوية 15°: معطلة", undo: "تراجع", resetBtn: "إعادة تعيين", apply: "تطبيق ✓" }
+};
+
 const btnStyle = (extra) => ({
   padding: "10px 14px",
   borderRadius: 10,
@@ -39,7 +54,8 @@ const btnStyle = (extra) => ({
   ...extra
 });
 
-export default function FreeDrawCanvas({ maxSegments, onCommit, onClose }) {
+export default function FreeDrawCanvas({ maxSegments, onCommit, onClose, lang }) {
+  const T = FREE_DRAW_I18N[lang] || FREE_DRAW_I18N.tr;
   const svgRef = useRef(null);
   const pointersRef = useRef(new Map());
   const pinchRef = useRef(null);
@@ -310,7 +326,7 @@ export default function FreeDrawCanvas({ maxSegments, onCommit, onClose }) {
         padding: "6px 12px", borderRadius: 999, border: "1px solid rgba(255,255,255,0.15)",
         pointerEvents: "none"
       }}>
-        Serbest Çizim {segmentCount}/{maxSegments}
+        {T.title} {segmentCount}/{maxSegments}
       </div>
 
       {/* Yuzen kapat butonu */}
@@ -325,7 +341,7 @@ export default function FreeDrawCanvas({ maxSegments, onCommit, onClose }) {
 
       {points.length === 0 && (
         <div style={{ position: "absolute", top: 56, left: 0, right: 0, textAlign: "center", color: "#9aa3ab", fontSize: 14, padding: "0 20px", zIndex: 2, pointerEvents: "none" }}>
-          Ekrana dokunup sürükleyerek ilk çizgiyi çiz. İki parmakla yakınlaştır/uzaklaştır.
+          {T.hint}
         </div>
       )}
 
@@ -336,20 +352,20 @@ export default function FreeDrawCanvas({ maxSegments, onCommit, onClose }) {
         padding: "10px 10px calc(10px + env(safe-area-inset-bottom, 12px))",
         background: "linear-gradient(180deg, rgba(5,7,10,0) 0%, #05070a 45%)"
       }}>
-        <button type="button" onClick={zoomOut} style={btnStyle()}>− Uzaklaştır</button>
-        <button type="button" onClick={zoomIn} style={btnStyle()}>+ Yakınlaştır</button>
+        <button type="button" onClick={zoomOut} style={btnStyle()}>{T.zoomOut}</button>
+        <button type="button" onClick={zoomIn} style={btnStyle()}>{T.zoomIn}</button>
         <button type="button" onClick={() => setAngleSnap((v) => !v)} style={btnStyle({ background: angleSnap ? "#20262e" : "#12161c" })}>
-          {angleSnap ? "15° Açı: Açık" : "15° Açı: Kapalı"}
+          {angleSnap ? T.angleOn : T.angleOff}
         </button>
-        <button type="button" onClick={undoLast} disabled={history.length === 0} style={btnStyle({ opacity: history.length === 0 ? 0.5 : 1 })}>Geri Al</button>
-        <button type="button" onClick={reset} style={btnStyle()}>Sıfırla</button>
+        <button type="button" onClick={undoLast} disabled={history.length === 0} style={btnStyle({ opacity: history.length === 0 ? 0.5 : 1 })}>{T.undo}</button>
+        <button type="button" onClick={reset} style={btnStyle()}>{T.resetBtn}</button>
         <button
           type="button"
           onClick={finish}
           disabled={points.length < 2}
           style={btnStyle({ border: "1px solid #cfd5da", background: "#20262e", color: "#f4f6f7", fontWeight: 800, opacity: points.length < 2 ? 0.5 : 1 })}
         >
-          Uygula ✓
+          {T.apply}
         </button>
       </div>
     </div>
