@@ -676,7 +676,7 @@ async function createPdfInner({ data, result, lang = "tr", action = "save" }) {
     // Genel profil (N segment): gerçek noktaları hesapla, çizim alanına ölçekle.
     const segs = Array.isArray(data.segments) ? data.segments : [];
     const realPts = computeGeneralPointsPdf(segs);
-    const pts = scalePointsToBoxPdf(realPts, 20, 58, 257, 108);
+    const pts = scalePointsToBoxPdf(realPts, 30, 62, 237, 95);
     doc.setDrawColor(...ink);
     doc.setLineCap("round");
     doc.setLineJoin("round");
@@ -703,7 +703,7 @@ async function createPdfInner({ data, result, lang = "tr", action = "save" }) {
             nx = -nx;
             ny = -ny;
           }
-          const offset = 7;
+          const offset = 12;
           const labelX = midX + nx * offset;
           const labelY = midY + ny * offset;
           let angleDeg = Math.atan2(dy, dx) * 180 / Math.PI;
