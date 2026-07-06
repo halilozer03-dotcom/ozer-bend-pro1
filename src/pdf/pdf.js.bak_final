@@ -676,7 +676,7 @@ async function createPdfInner({ data, result, lang = "tr", action = "save" }) {
     // Genel profil (N segment): gerçek noktaları hesapla, çizim alanına ölçekle.
     const segs = Array.isArray(data.segments) ? data.segments : [];
     const realPts = computeGeneralPointsPdf(segs);
-    const pts = scalePointsToBoxPdf(realPts, 55, 68, 187, 82);
+    const pts = scalePointsToBoxPdf(realPts, 30, 62, 237, 95);
     doc.setDrawColor(...ink);
     doc.setLineCap("round");
     doc.setLineJoin("round");
