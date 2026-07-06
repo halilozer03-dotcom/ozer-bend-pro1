@@ -21,7 +21,9 @@
     "react-dom": "latest",
     "jspdf": "latest",
     "three": "latest",
-    "@capacitor/screen-orientation": "^7.0.0"
+    "@capacitor/screen-orientation": "^7.0.0",
+    "konva": "latest",
+    "react-konva": "latest"
   },
   "devDependencies": {
     "@capacitor/cli": "7.4.3",

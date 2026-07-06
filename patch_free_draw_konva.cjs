@@ -1,4 +1,41 @@
-import React, { useRef, useState, useCallback, useEffect } from "react";
+// patch_free_draw_konva.cjs
+// Serbest Cizim'i Konva.js (react-konva) tabanli, nesne odakli bir editore
+// donusturur:
+// - "Cizim" modu: onceki gibi dokunup surukleyerek yeni segment ekle
+// - "Duzenle" modu: mevcut herhangi bir noktaya (koseye) dokunup surukleyerek
+//   onu yeniden konumlandir - iki komsu segment otomatik guncellenir
+// - Iki parmakla pinch-zoom, 5mm izgara yapisma, 15 derece aci kilidi
+//   (cizim modunda), Geri Al / Sifirla / Uygula ayni sekilde calisir
+// - Buku yonu isareti onceki v5'teki gibi duzeltilmis halde korunur
+
+const fs = require("fs");
+const path = require("path");
+
+const ROOT = process.cwd();
+const PACKAGE_JSON = path.join(ROOT, "package.json");
+const FREEDRAW_JSX = path.join(ROOT, "src", "freedraw.jsx");
+
+/* 1) package.json'a konva + react-konva ekle */
+const pkg = JSON.parse(fs.readFileSync(PACKAGE_JSON, "utf8"));
+if (!pkg.dependencies) pkg.dependencies = {};
+let addedAny = false;
+if (!pkg.dependencies["konva"]) {
+  pkg.dependencies["konva"] = "latest";
+  addedAny = true;
+}
+if (!pkg.dependencies["react-konva"]) {
+  pkg.dependencies["react-konva"] = "latest";
+  addedAny = true;
+}
+if (addedAny) {
+  fs.writeFileSync(PACKAGE_JSON, JSON.stringify(pkg, null, 2) + "\n", "utf8");
+  console.log("[OK] konva + react-konva package.json'a eklendi");
+} else {
+  console.log("[BILGI] konva + react-konva zaten package.json'da vardi");
+}
+
+/* 2) freedraw.jsx - Konva tabanli tamamen yeni surum */
+const FREEDRAW_CONTENT = `import React, { useRef, useState, useCallback, useEffect } from "react";
 import { Stage, Layer, Line, Circle, Text, Rect, Group } from "react-konva";
 
 const GRID_MM = 5;
@@ -250,10 +287,10 @@ export default function FreeDrawCanvas({ maxSegments, onCommit, onClose }) {
   const gridLines = [];
   for (let g = -GRID_RANGE; g <= GRID_RANGE; g += gridStep) {
     gridLines.push(
-      <Line key={`v${g}`} points={[g, -GRID_RANGE, g, GRID_RANGE]} stroke="rgba(255,255,255,0.10)" strokeWidth={1 / scale} />
+      <Line key={\`v\${g}\`} points={[g, -GRID_RANGE, g, GRID_RANGE]} stroke="rgba(255,255,255,0.10)" strokeWidth={1 / scale} />
     );
     gridLines.push(
-      <Line key={`h${g}`} points={[-GRID_RANGE, g, GRID_RANGE, g]} stroke="rgba(255,255,255,0.10)" strokeWidth={1 / scale} />
+      <Line key={\`h\${g}\`} points={[-GRID_RANGE, g, GRID_RANGE, g]} stroke="rgba(255,255,255,0.10)" strokeWidth={1 / scale} />
     );
   }
 
@@ -270,7 +307,7 @@ export default function FreeDrawCanvas({ maxSegments, onCommit, onClose }) {
     const angleDeg = Math.round(((Math.atan2(dy, dx) * 180) / Math.PI + 360) % 360);
     const lx = (anchorPoint.x + drag.x) / 2;
     const ly = (anchorPoint.y + drag.y) / 2 - 18 / scale;
-    liveLabel = { x: lx, y: ly, text: `${len} mm  •  ${angleDeg}°` };
+    liveLabel = { x: lx, y: ly, text: \`\${len} mm  •  \${angleDeg}°\` };
   }
 
   const strokeW = Math.max(0.6, 3 / scale);
@@ -417,3 +454,11 @@ export default function FreeDrawCanvas({ maxSegments, onCommit, onClose }) {
     </div>
   );
 }
+`;
+
+fs.writeFileSync(FREEDRAW_JSX, FREEDRAW_CONTENT, "utf8");
+console.log("[OK] src/freedraw.jsx Konva tabanli editor ile degistirildi");
+
+console.log("\n✅ KONVA TABANLI SERBEST CIZIM EDITORU BASARIYLA UYGULANDI.");
+console.log("NOT: Yeni paketler (konva, react-konva) eklendigi icin bu derleme biraz daha uzun surebilir.");
+console.log("Simdi: git add -A && git commit -m \"Serbest Cizim: Konva.js tabanli gelismis editore geçildi\" && git push -u origin main");
