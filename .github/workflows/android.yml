@@ -37,6 +37,9 @@ jobs:
       - name: Add Android platform
         run: npx cap add android
 
+      - name: Set versionCode
+        run: sed -i "s/versionCode 1/versionCode $GITHUB_RUN_NUMBER/" android/app/build.gradle
+
       - name: Generate app icons from logo
         run: npx capacitor-assets generate --android
 
