@@ -1434,7 +1434,10 @@ function App() {
               />
             </label>
             <p style={{ fontSize: 11.5, color: "#8b929b", lineHeight: 1.6, gridColumn: "1 / -1", marginTop: 4 }}>
-              {t.trademarkDisclaimer}
+              © {new Date().getFullYear()} ÖZER BEND PRO. All rights reserved. DURMA, Hardox and other
+              product/brand names mentioned in this app are trademarks of their respective owners.
+              This app is not affiliated with or endorsed by these companies; these names are used
+              solely for compatibility/identification purposes.
             </p>
             {select(t.machineLabel, machine, setMachine, machines)}
             {select(t.lowerDieLabel, lowerDie, setLowerDie, availableLowerDies)}
