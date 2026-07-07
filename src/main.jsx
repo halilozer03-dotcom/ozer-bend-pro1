@@ -1497,6 +1497,12 @@ function App() {
               tarafından onaylanmamıştır; bu isimler yalnızca uyumluluk/tanımlama amacıyla
               kullanılmaktadır.
             </p>
+            <p style={{ fontSize: 11.5, color: "#8b929b", lineHeight: 1.6, gridColumn: "1 / -1", marginTop: 4 }}>
+              DURMA, Hardox ve uygulama içinde geçen diğer ürün/marka adları ilgili sahiplerinin
+              ticari markalarıdır. Bu uygulama bu firmalarla bağlantılı değildir ve onlar
+              tarafından onaylanmamıştır; bu isimler yalnızca uyumluluk/tanımlama amacıyla
+              kullanılmaktadır.
+            </p>
             {select(t.machineLabel, machine, setMachine, machines)}
             {select(t.lowerDieLabel, lowerDie, setLowerDie, lowerDies)}
             {select(t.upperDieLabel, upperDie, setUpperDie, upperDies)}
