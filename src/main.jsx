@@ -18,20 +18,20 @@ function openFeedbackMail({ subject, message }) {
 
 const machines = [
   "DURMA Easy",
-  "DURMA AD-S 30175",
-  "DURMA AD-S 30220",
-  "DURMA AD-S 37220",
-  "DURMA AD-R 30135",
-  "DURMA AD-R 30175",
-  "DURMA HAP 30120",
-  "DURMA HAP 30200",
   "Baykal APHS",
   "Ermaksan Speed-Bend",
   "Amada HFE",
   "Trumpf TruBend",
   "SafanDarley E-Brake",
   "LVD PPEB",
-  "Gasparini PBS"
+  "Gasparini PBS",
+  "Bystronic Xpert",
+  "Prima Power BCe",
+  "Cincinnati Autoform",
+  "HACO Synchro",
+  "Adira PA",
+  "Estun E21",
+  "Boschert Compact"
 ];
 
 const lowerDies = [
