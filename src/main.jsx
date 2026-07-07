@@ -179,7 +179,7 @@ function scalePointsToBox(pts, vbW, vbH, pad) {
 
 const DICT = {
   tr: {
-    app: "ÖZER BEND PRO V127",
+    app: "ÖZER BEND PRO V1",
     dims: "ÖLÇÜLER",
     profile: "PROFİL",
     settings: "AYARLAR",
@@ -240,7 +240,7 @@ const DICT = {
     trademarkDisclaimer: "DURMA, Hardox ve uygulama içinde geçen diğer ürün/marka adları ilgili sahiplerinin ticari markalarıdır. Bu uygulama bu firmalarla bağlantılı değildir ve onlar tarafından onaylanmamıştır; bu isimler yalnızca uyumluluk/tanımlama amacıyla kullanılmaktadır."
   },
   en: {
-    app: "ÖZER BEND PRO V127",
+    app: "ÖZER BEND PRO V1",
     dims: "DIMENSIONS",
     profile: "PROFILE",
     settings: "SETTINGS",
@@ -301,7 +301,7 @@ const DICT = {
     trademarkDisclaimer: "DURMA, Hardox and other product/brand names mentioned in the app are trademarks of their respective owners. This app is not affiliated with or endorsed by these companies; these names are used solely for compatibility/identification purposes."
   },
   fr: {
-    app: "ÖZER BEND PRO V127",
+    app: "ÖZER BEND PRO V1",
     dims: "DIMENSIONS",
     profile: "PROFIL",
     settings: "RÉGLAGES",
@@ -362,7 +362,7 @@ const DICT = {
     trademarkDisclaimer: "DURMA, Hardox et les autres noms de produits/marques mentionnés dans l'application sont des marques déposées de leurs propriétaires respectifs. Cette application n'est pas affiliée à ces entreprises ni approuvée par elles ; ces noms sont utilisés uniquement à des fins de compatibilité/identification."
   },
   de: {
-    app: "ÖZER BEND PRO V127",
+    app: "ÖZER BEND PRO V1",
     dims: "ABMESSUNGEN",
     profile: "PROFIL",
     settings: "EINSTELLUNGEN",
@@ -423,7 +423,7 @@ const DICT = {
     trademarkDisclaimer: "DURMA, Hardox und andere in der App genannte Produkt-/Markennamen sind Marken ihrer jeweiligen Inhaber. Diese App steht in keiner Verbindung zu diesen Unternehmen und wird von ihnen nicht unterstützt; diese Namen werden ausschließlich zu Kompatibilitäts-/Identifikationszwecken verwendet."
   },
   es: {
-    app: "ÖZER BEND PRO V127",
+    app: "ÖZER BEND PRO V1",
     dims: "DIMENSIONES",
     profile: "PERFIL",
     settings: "AJUSTES",
@@ -484,7 +484,7 @@ const DICT = {
     trademarkDisclaimer: "DURMA, Hardox y otros nombres de productos/marcas mencionados en la aplicación son marcas registradas de sus respectivos propietarios. Esta aplicación no está afiliada ni respaldada por estas empresas; estos nombres se utilizan únicamente con fines de compatibilidad/identificación."
   },
   it: {
-    app: "ÖZER BEND PRO V127",
+    app: "ÖZER BEND PRO V1",
     dims: "DIMENSIONI",
     profile: "PROFILO",
     settings: "IMPOSTAZIONI",
@@ -545,7 +545,7 @@ const DICT = {
     trademarkDisclaimer: "DURMA, Hardox e altri nomi di prodotti/marchi menzionati nell'app sono marchi dei rispettivi proprietari. Questa app non è affiliata né approvata da queste aziende; questi nomi sono utilizzati esclusivamente a scopo di compatibilità/identificazione."
   },
   ru: {
-    app: "ÖZER BEND PRO V127",
+    app: "ÖZER BEND PRO V1",
     dims: "РАЗМЕРЫ",
     profile: "ПРОФИЛЬ",
     settings: "НАСТРОЙКИ",
@@ -606,7 +606,7 @@ const DICT = {
     trademarkDisclaimer: "DURMA, Hardox и другие названия продуктов/торговых марок, упомянутые в приложении, являются товарными знаками соответствующих владельцев. Это приложение не связано с этими компаниями и не одобрено ими; эти названия используются исключительно в целях совместимости/идентификации."
   },
   pt: {
-    app: "ÖZER BEND PRO V127",
+    app: "ÖZER BEND PRO V1",
     dims: "DIMENSÕES",
     profile: "PERFIL",
     settings: "CONFIGURAÇÕES",
@@ -667,7 +667,7 @@ const DICT = {
     trademarkDisclaimer: "DURMA, Hardox e outros nomes de produtos/marcas mencionados no aplicativo são marcas registradas de seus respectivos proprietários. Este aplicativo não é afiliado nem endossado por essas empresas; esses nomes são usados apenas para fins de compatibilidade/identificação."
   },
   pl: {
-    app: "ÖZER BEND PRO V127",
+    app: "ÖZER BEND PRO V1",
     dims: "WYMIARY",
     profile: "PROFIL",
     settings: "USTAWIENIA",
@@ -728,7 +728,7 @@ const DICT = {
     trademarkDisclaimer: "DURMA, Hardox i inne nazwy produktów/marek wymienione w aplikacji są znakami towarowymi ich odpowiednich właścicieli. Ta aplikacja nie jest powiązana z tymi firmami ani przez nie zatwierdzona; te nazwy są używane wyłącznie w celach kompatybilności/identyfikacji."
   },
   zh: {
-    app: "ÖZER BEND PRO V127",
+    app: "ÖZER BEND PRO V1",
     dims: "尺寸",
     profile: "型材",
     settings: "设置",
@@ -789,7 +789,7 @@ const DICT = {
     trademarkDisclaimer: "DURMA、Hardox 及应用程序中提到的其他产品/品牌名称均为其各自所有者的商标。本应用程序与这些公司无关，也未获得其认可；这些名称仅用于兼容性/识别目的。"
   },
   ar: {
-    app: "ÖZER BEND PRO V127",
+    app: "ÖZER BEND PRO V1",
     dims: "الأبعاد",
     profile: "الملف",
     settings: "الإعدادات",
