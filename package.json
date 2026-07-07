@@ -23,8 +23,7 @@
     "three": "latest",
     "@capacitor/screen-orientation": "^7.0.0",
     "konva": "latest",
-    "react-konva": "latest",
-    "@capacitor-community/speech-recognition": "latest"
+    "react-konva": "latest"
   },
   "devDependencies": {
     "@capacitor/cli": "7.4.3",
