@@ -6,6 +6,7 @@ import FreeDrawCanvas from "./freedraw";
 import WeightCalc from "./weightcalc";
 import logoUrl from "./assets/logo.jpg";
 import FullscreenViewer from "./viewer3d";
+import { canUse3D, getCompanyLogo, setCompanyLogo, isProUser, trialDaysLeft } from "./license.js";
 
 const FEEDBACK_EMAIL = "ozerbend@gmail.com";
 
@@ -903,6 +904,29 @@ function App() {
     } catch (e) {}
   }, [lang]);
   const [showSettings, setShowSettings] = useState(false);
+  const [companyLogo, setCompanyLogoState] = useState(() => getCompanyLogo());
+  const handleLogoFile = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const sc = Math.min(1, 600 / img.width);
+        const cv = document.createElement("canvas");
+        cv.width = Math.round(img.width * sc);
+        cv.height = Math.round(img.height * sc);
+        cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height);
+        const dataUrl = cv.toDataURL("image/png");
+        setCompanyLogo(dataUrl);
+        setCompanyLogoState(dataUrl);
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+  const handleLogoRemove = () => { setCompanyLogo(null); setCompanyLogoState(null); };
   const [companyName, setCompanyName] = useState(() => {
     try {
       const saved = localStorage.getItem("ozerbend_company");
@@ -1455,6 +1479,22 @@ function App() {
                 placeholder="ÖZER BEND PRO"
               />
             </label>
+            <label style={{ gridColumn: "1 / -1" }}>Firma Logosu (PDF sol üst köşede görünür)
+              <input type="file" accept="image/*" onChange={handleLogoFile} />
+              {companyLogo && (
+                <span style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 6 }}>
+                  <img src={companyLogo} alt="logo" style={{ height: 40, background: "#fff", borderRadius: 4, padding: 2 }} />
+                  <button type="button" onClick={handleLogoRemove}>Logoyu Kaldır</button>
+                </span>
+              )}
+            </label>
+            <p style={{ gridColumn: "1 / -1", fontSize: 12, color: "#c9a227", margin: "2px 0" }}>
+              {isProUser()
+                ? "PRO aktif — tüm özellikler açık"
+                : (trialDaysLeft() > 0
+                  ? "Deneme sürümü: " + trialDaysLeft() + " gün kaldı"
+                  : "Deneme doldu — günde 3 PDF; logo ve 3D kilitli")}
+            </p>
             <p style={{ fontSize: 11.5, color: "#8b929b", lineHeight: 1.6, gridColumn: "1 / -1", marginTop: 4 }}>
               © {new Date().getFullYear()} ÖZER BEND PRO. All rights reserved. DURMA, Hardox and other
               product/brand names mentioned in this app are trademarks of their respective owners.
@@ -1710,7 +1750,15 @@ function App() {
         </button>
       </div>
 
-      {showFullscreen && (
+      {showFullscreen && !canUse3D() && (
+          <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.9)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 24, textAlign: "center" }}>
+            <div style={{ fontSize: 42 }}>🔒</div>
+            <div style={{ color: "#fff", fontSize: 17, fontWeight: 700 }}>3D önizleme PRO özelliğidir / 3D preview is a PRO feature</div>
+            <div style={{ color: "#bbb", fontSize: 13, maxWidth: 420 }}>7 günlük deneme süreniz doldu. Sınırsız PDF, logo ve 3D için PRO (9.99€, tek seferlik).</div>
+            <button type="button" onClick={() => setShowFullscreen(false)} style={{ marginTop: 8, padding: "10px 22px", borderRadius: 8, border: "1px solid #c9a227", background: "#c9a227", color: "#000", fontWeight: 700 }}>Kapat / Close</button>
+          </div>
+        )}
+        {showFullscreen && canUse3D() && (
         <FullscreenViewer
           points={crossSection3DDisplay}
           thickness={thickness}
