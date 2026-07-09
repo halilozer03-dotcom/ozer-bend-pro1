@@ -1,4 +1,5 @@
 import { jsPDF } from "jspdf";
+import { consumePdfCredit, canUseLogo, getCompanyLogo } from "../license.js";
 import { Capacitor } from "@capacitor/core";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
@@ -581,6 +582,9 @@ export async function createPdf(args) {
 
 async function createPdfInner({ data, result, lang = "tr", action = "save" }) {
   const d = pdfDict(lang);
+  const _gate = consumePdfCredit();
+  if (!_gate.ok) { alert(_gate.message); return; }
+
   const doc = new jsPDF("landscape", "mm", "a4");
 
   // jsPDF'in yerleşik Helvetica fontu Türkçe'ye özgü noktalı büyük İ (U+0130)
@@ -630,6 +634,17 @@ async function createPdfInner({ data, result, lang = "tr", action = "save" }) {
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.45);
   doc.rect(1.5, 1.5, 294, 207);
+
+  try {
+    const _logoData = canUseLogo() ? getCompanyLogo() : null;
+    if (_logoData) {
+      const _lp = doc.getImageProperties(_logoData);
+      let _lh = 21;
+      let _lw = (_lp.width / _lp.height) * _lh;
+      if (_lw > 55) { _lh = _lh * (55 / _lw); _lw = 55; }
+      doc.addImage(_logoData, _lp.fileType || "PNG", 5, 4, _lw, _lh);
+    }
+  } catch (_e) {}
 
   // Logo ve başlık.
   doc.setFont("helvetica", "bold");
