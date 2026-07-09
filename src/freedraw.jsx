@@ -32,7 +32,22 @@ const btnStyle = (extra) => ({
   ...extra
 });
 
-export default function FreeDrawCanvas({ maxSegments, onCommit, onClose }) {
+const FD_DICT = {
+  tr: { title: "Serbest Çizim", draw: "Çiz", edit: "Düzenle", drawMode: "Çiz Modu", editMode: "Düzenle Modu", zoomOut: "Uzaklaştır", zoomIn: "Yakınlaştır", angleOn: "15° Açı: Açık", angleOff: "15° Açı: Kapalı", undo: "Geri Al", reset: "Sıfırla", apply: "Uygula", hint: "{T.hint}" },
+  en: { title: "Free Draw", draw: "Draw", edit: "Edit", drawMode: "Draw Mode", editMode: "Edit Mode", zoomOut: "Zoom Out", zoomIn: "Zoom In", angleOn: "15° Angle: On", angleOff: "15° Angle: Off", undo: "Undo", reset: "Reset", apply: "Apply", hint: "Touch and drag to draw the first line. Pinch with two fingers to zoom." },
+  fr: { title: "Dessin libre", draw: "Dessiner", edit: "Modifier", drawMode: "Mode dessin", editMode: "Mode édition", zoomOut: "Réduire", zoomIn: "Agrandir", angleOn: "Angle 15° : Activé", angleOff: "Angle 15° : Désactivé", undo: "Annuler", reset: "Réinitialiser", apply: "Appliquer", hint: "Touchez et faites glisser pour tracer la première ligne. Pincez avec deux doigts pour zoomer." },
+  de: { title: "Freies Zeichnen", draw: "Zeichnen", edit: "Bearbeiten", drawMode: "Zeichenmodus", editMode: "Bearbeitungsmodus", zoomOut: "Verkleinern", zoomIn: "Vergrößern", angleOn: "15°-Winkel: Ein", angleOff: "15°-Winkel: Aus", undo: "Rückgängig", reset: "Zurücksetzen", apply: "Anwenden", hint: "Zum Zeichnen der ersten Linie tippen und ziehen. Mit zwei Fingern zoomen." },
+  es: { title: "Dibujo libre", draw: "Dibujar", edit: "Editar", drawMode: "Modo dibujo", editMode: "Modo edición", zoomOut: "Alejar", zoomIn: "Acercar", angleOn: "Ángulo 15°: Activado", angleOff: "Ángulo 15°: Desactivado", undo: "Deshacer", reset: "Restablecer", apply: "Aplicar", hint: "Toca y arrastra para dibujar la primera línea. Pellizca con dos dedos para hacer zoom." },
+  it: { title: "Disegno libero", draw: "Disegna", edit: "Modifica", drawMode: "Modalità disegno", editMode: "Modalità modifica", zoomOut: "Riduci", zoomIn: "Ingrandisci", angleOn: "Angolo 15°: Attivo", angleOff: "Angolo 15°: Disattivo", undo: "Annulla", reset: "Reimposta", apply: "Applica", hint: "Tocca e trascina per disegnare la prima linea. Pizzica con due dita per lo zoom." },
+  ru: { title: "Свободное рисование", draw: "Рисование", edit: "Правка", drawMode: "Режим рисования", editMode: "Режим правки", zoomOut: "Отдалить", zoomIn: "Приблизить", angleOn: "Угол 15°: Вкл", angleOff: "Угол 15°: Выкл", undo: "Отменить", reset: "Сброс", apply: "Применить", hint: "Коснитесь и проведите, чтобы нарисовать первую линию. Масштаб — двумя пальцами." },
+  pt: { title: "Desenho livre", draw: "Desenhar", edit: "Editar", drawMode: "Modo desenho", editMode: "Modo edição", zoomOut: "Afastar", zoomIn: "Aproximar", angleOn: "Ângulo 15°: Ativado", angleOff: "Ângulo 15°: Desativado", undo: "Desfazer", reset: "Redefinir", apply: "Aplicar", hint: "Toque e arraste para desenhar a primeira linha. Belisque com dois dedos para ampliar." },
+  pl: { title: "Rysowanie odręczne", draw: "Rysuj", edit: "Edytuj", drawMode: "Tryb rysowania", editMode: "Tryb edycji", zoomOut: "Oddal", zoomIn: "Przybliż", angleOn: "Kąt 15°: Wł.", angleOff: "Kąt 15°: Wył.", undo: "Cofnij", reset: "Resetuj", apply: "Zastosuj", hint: "Dotknij i przeciągnij, aby narysować pierwszą linię. Powiększaj dwoma palcami." },
+  zh: { title: "自由绘图", draw: "绘制", edit: "编辑", drawMode: "绘制模式", editMode: "编辑模式", zoomOut: "缩小", zoomIn: "放大", angleOn: "15°角度：开", angleOff: "15°角度：关", undo: "撤销", reset: "重置", apply: "应用", hint: "触摸并拖动以绘制第一条线。双指缩放。" },
+  ar: { title: "رسم حر", draw: "رسم", edit: "تعديل", drawMode: "وضع الرسم", editMode: "وضع التعديل", zoomOut: "تصغير", zoomIn: "تكبير", angleOn: "زاوية 15°: مفعّل", angleOff: "زاوية 15°: معطّل", undo: "تراجع", reset: "إعادة تعيين", apply: "تطبيق", hint: "المس واسحب لرسم الخط الأول. قرّب بإصبعين للتكبير." }
+};
+
+export default function FreeDrawCanvas({ maxSegments, onCommit, onClose, lang }) {
+  const T = FD_DICT[lang] || FD_DICT.en;
   const wrapRef = useRef(null);
   const stageRef = useRef(null);
   const pinchRef = useRef(null);
@@ -367,7 +382,7 @@ export default function FreeDrawCanvas({ maxSegments, onCommit, onClose }) {
         padding: "6px 12px", borderRadius: 999, border: "1px solid rgba(255,255,255,0.15)",
         pointerEvents: "none"
       }}>
-        Serbest Çizim {segmentCount}/{maxSegments} — {mode === "draw" ? "Çiz" : "Düzenle"}
+        {T.title} {segmentCount}/{maxSegments} — {mode === "draw" ? T.draw : T.edit}
       </div>
 
       <button
@@ -396,22 +411,22 @@ export default function FreeDrawCanvas({ maxSegments, onCommit, onClose }) {
           onClick={() => setMode((m) => (m === "draw" ? "edit" : "draw"))}
           style={btnStyle({ background: mode === "edit" ? "#3a2e10" : "#20262e", border: "1px solid " + (mode === "edit" ? "#ffd35a" : "rgba(207,213,218,.35)") })}
         >
-          {mode === "draw" ? "✏️ Çiz Modu" : "✥ Düzenle Modu"}
+          {mode === "draw" ? "✏️ " + T.drawMode : "✥ " + T.editMode}
         </button>
-        <button type="button" onClick={zoomOut} style={btnStyle()}>− Uzaklaştır</button>
-        <button type="button" onClick={zoomIn} style={btnStyle()}>+ Yakınlaştır</button>
+        <button type="button" onClick={zoomOut} style={btnStyle()}>− {T.zoomOut}</button>
+        <button type="button" onClick={zoomIn} style={btnStyle()}>+ {T.zoomIn}</button>
         <button type="button" onClick={() => setAngleSnap((v) => !v)} style={btnStyle({ background: angleSnap ? "#20262e" : "#12161c" })}>
-          {angleSnap ? "15° Açı: Açık" : "15° Açı: Kapalı"}
+          {angleSnap ? T.angleOn : T.angleOff}
         </button>
-        <button type="button" onClick={undoLast} disabled={history.length === 0} style={btnStyle({ opacity: history.length === 0 ? 0.5 : 1 })}>Geri Al</button>
-        <button type="button" onClick={reset} style={btnStyle()}>Sıfırla</button>
+        <button type="button" onClick={undoLast} disabled={history.length === 0} style={btnStyle({ opacity: history.length === 0 ? 0.5 : 1 })}>{T.undo}</button>
+        <button type="button" onClick={reset} style={btnStyle()}>{T.reset}</button>
         <button
           type="button"
           onClick={finish}
           disabled={points.length < 2}
           style={btnStyle({ border: "1px solid #cfd5da", background: "#20262e", color: "#f4f6f7", fontWeight: 800, opacity: points.length < 2 ? 0.5 : 1 })}
         >
-          Uygula ✓
+          {T.apply} ✓
         </button>
       </div>
     </div>

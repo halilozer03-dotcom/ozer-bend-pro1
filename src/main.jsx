@@ -8,6 +8,21 @@ import logoUrl from "./assets/logo.jpg";
 import FullscreenViewer from "./viewer3d";
 import { canUse3D, getCompanyLogo, setCompanyLogo, isProUser, trialDaysLeft } from "./license.js";
 
+const SETTINGS_TXT = {
+  tr: { companyName: "Firma Adı (PDF başlığında görünür)", logoLabel: "Firma Logosu (PDF sol üst köşede görünür)", logoRemove: "Logoyu Kaldır", proActive: stx(lang).proActive, trialLeft: (n) => "Deneme sürümü: " + n + " gün kaldı", trialOver: stx(lang).trialOver },
+  en: { companyName: "Company Name (shown in PDF header)", logoLabel: "Company Logo (shown at top-left of PDF)", logoRemove: "Remove Logo", proActive: "PRO active — all features unlocked", trialLeft: (n) => "Trial: " + n + " day(s) left", trialOver: "Trial ended — 3 PDFs/day; logo & 3D locked" },
+  fr: { companyName: "Nom de l'entreprise (visible dans l'en-tête du PDF)", logoLabel: "Logo de l'entreprise (en haut à gauche du PDF)", logoRemove: "Supprimer le logo", proActive: "PRO actif — toutes les fonctionnalités débloquées", trialLeft: (n) => "Essai : " + n + " jour(s) restant(s)", trialOver: "Essai terminé — 3 PDF/jour ; logo et 3D verrouillés" },
+  de: { companyName: "Firmenname (erscheint in der PDF-Kopfzeile)", logoLabel: "Firmenlogo (oben links im PDF)", logoRemove: "Logo entfernen", proActive: "PRO aktiv — alle Funktionen freigeschaltet", trialLeft: (n) => "Testversion: noch " + n + " Tag(e)", trialOver: "Test abgelaufen — 3 PDFs/Tag; Logo & 3D gesperrt" },
+  es: { companyName: "Nombre de la empresa (visible en el encabezado del PDF)", logoLabel: "Logotipo de la empresa (arriba a la izquierda del PDF)", logoRemove: "Quitar logotipo", proActive: "PRO activo — todas las funciones desbloqueadas", trialLeft: (n) => "Prueba: quedan " + n + " día(s)", trialOver: "Prueba finalizada — 3 PDF/día; logo y 3D bloqueados" },
+  it: { companyName: "Nome azienda (visibile nell'intestazione del PDF)", logoLabel: "Logo aziendale (in alto a sinistra nel PDF)", logoRemove: "Rimuovi logo", proActive: "PRO attivo — tutte le funzioni sbloccate", trialLeft: (n) => "Prova: " + n + " giorno/i rimasti", trialOver: "Prova terminata — 3 PDF/giorno; logo e 3D bloccati" },
+  ru: { companyName: "Название компании (отображается в заголовке PDF)", logoLabel: "Логотип компании (вверху слева в PDF)", logoRemove: "Удалить логотип", proActive: "PRO активен — все функции доступны", trialLeft: (n) => "Пробный период: осталось " + n + " дн.", trialOver: "Пробный период истёк — 3 PDF/день; логотип и 3D заблокированы" },
+  pt: { companyName: "Nome da empresa (exibido no cabeçalho do PDF)", logoLabel: "Logotipo da empresa (no canto superior esquerdo do PDF)", logoRemove: "Remover logotipo", proActive: "PRO ativo — todos os recursos desbloqueados", trialLeft: (n) => "Teste: restam " + n + " dia(s)", trialOver: "Teste encerrado — 3 PDFs/dia; logo e 3D bloqueados" },
+  pl: { companyName: "Nazwa firmy (widoczna w nagłówku PDF)", logoLabel: "Logo firmy (w lewym górnym rogu PDF)", logoRemove: "Usuń logo", proActive: "PRO aktywny — wszystkie funkcje odblokowane", trialLeft: (n) => "Wersja próbna: pozostało " + n + " dni", trialOver: "Okres próbny zakończony — 3 PDF/dzień; logo i 3D zablokowane" },
+  zh: { companyName: "公司名称（显示在PDF标题中）", logoLabel: "公司标志（显示在PDF左上角）", logoRemove: "移除标志", proActive: "PRO已激活 — 所有功能已解锁", trialLeft: (n) => "试用期：剩余" + n + "天", trialOver: "试用已结束 — 每天3个PDF；标志和3D已锁定" },
+  ar: { companyName: "اسم الشركة (يظهر في ترويسة PDF)", logoLabel: "شعار الشركة (أعلى يسار PDF)", logoRemove: "إزالة الشعار", proActive: "PRO مفعّل — جميع الميزات متاحة", trialLeft: (n) => "الفترة التجريبية: تبقى " + n + " يوم", trialOver: "انتهت الفترة التجريبية — 3 PDF يوميًا؛ الشعار وثلاثي الأبعاد مقفلان" }
+};
+const stx = (l) => SETTINGS_TXT[l] || SETTINGS_TXT.en;
+
 const FEEDBACK_EMAIL = "ozerbend@gmail.com";
 
 function openFeedbackMail({ subject, message }) {
@@ -1471,7 +1486,7 @@ function App() {
         <section className="panel settingsPanel">
           <h2>{t.settings}</h2>
           <div className="grid">
-            <label>Firma Adı (PDF başlığında görünür)
+            <label>{stx(lang).companyName}
               <input
                 type="text"
                 value={companyName}
@@ -1479,12 +1494,12 @@ function App() {
                 placeholder="ÖZER BEND PRO"
               />
             </label>
-            <label style={{ gridColumn: "1 / -1" }}>Firma Logosu (PDF sol üst köşede görünür)
+            <label style={{ gridColumn: "1 / -1" }}>{stx(lang).logoLabel}
               <input type="file" accept="image/*" onChange={handleLogoFile} />
               {companyLogo && (
                 <span style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 6 }}>
                   <img src={companyLogo} alt="logo" style={{ height: 40, background: "#fff", borderRadius: 4, padding: 2 }} />
-                  <button type="button" onClick={handleLogoRemove}>Logoyu Kaldır</button>
+                  <button type="button" onClick={handleLogoRemove}>{stx(lang).logoRemove}</button>
                 </span>
               )}
             </label>
@@ -1492,7 +1507,7 @@ function App() {
               {isProUser()
                 ? "PRO aktif — tüm özellikler açık"
                 : (trialDaysLeft() > 0
-                  ? "Deneme sürümü: " + trialDaysLeft() + " gün kaldı"
+                  ? stx(lang).trialLeft(trialDaysLeft())
                   : "Deneme doldu — günde 3 PDF; logo ve 3D kilitli")}
             </p>
             <p style={{ fontSize: 11.5, color: "#8b929b", lineHeight: 1.6, gridColumn: "1 / -1", marginTop: 4 }}>
