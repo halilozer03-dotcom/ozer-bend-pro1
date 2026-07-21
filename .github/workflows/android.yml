@@ -37,6 +37,15 @@ jobs:
       - name: Add Android platform
         run: npx cap add android
 
+      - name: Set target/compile SDK to 36 (Google Play Ağustos 2026 şartı)
+        run: |
+          sed -i "s/compileSdkVersion = 35/compileSdkVersion = 36/" android/variables.gradle
+          sed -i "s/targetSdkVersion = 35/targetSdkVersion = 36/" android/variables.gradle
+
+      - name: Bump Android Gradle Plugin (compileSdk 36 desteği için)
+        run: |
+          sed -i "s/com.android.tools.build:gradle:8.7.2/com.android.tools.build:gradle:8.9.1/" android/build.gradle
+
       - name: Set versionCode
         run: sed -i "s/versionCode 1/versionCode $GITHUB_RUN_NUMBER/" android/app/build.gradle
 
