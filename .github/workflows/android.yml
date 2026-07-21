@@ -49,12 +49,6 @@ jobs:
       - name: Set versionCode
         run: sed -i "s/versionCode 1/versionCode $GITHUB_RUN_NUMBER/" android/app/build.gradle
 
-      - name: Set versionCode and BILLING
-        run: |
-          sed -i "s/versionCode 1/versionCode $GITHUB_RUN_NUMBER/" android/app/build.gradle
-          sed -i "s|</manifest>|    <uses-permission android:name=\"com.android.vending.BILLING\" />\n</manifest>|" android/app/src/main/AndroidManifest.xml
-          echo "Done"
-
       - name: Generate app icons from logo
         run: npx capacitor-assets generate --android
 
