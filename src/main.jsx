@@ -1471,7 +1471,7 @@ function App() {
       <text x="705" y="155" className="angle">90°</text>
       <text x="705" y="250" className="angle">90°</text>
       <line x1="160" y1="270" x2="340" y2="160" className="profile" />
-      <text x="230" y="190" className="txt" transform="rotate(-31.4 230 190)">{t.lengthWord}: {H} mm</text>
+      <text x="230" y="190" className="txt" transform="rotate(-31.4 230 190)">{H} mm</text>
     </svg>
   );
 
