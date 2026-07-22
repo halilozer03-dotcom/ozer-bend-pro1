@@ -22,6 +22,7 @@
     "jspdf": "latest",
     "three": "latest",
     "@capacitor/screen-orientation": "^7.0.0",
+    "@revenuecat/purchases-capacitor": "^10.2.4",
     "konva": "latest",
     "react-konva": "latest"
   },
