@@ -114,7 +114,7 @@ function ThreeDCanvas({ points, thickness, depth }) {
     scene.background = new THREE.Color(0x0a0d12);
 
     const aspect = width / height;
-    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 100000);
+    const camera = new THREE.PerspectiveCamera(50, aspect, 0.1, 100000);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -168,20 +168,16 @@ function ThreeDCanvas({ points, thickness, depth }) {
       dir1.shadow.camera.updateProjectionMatrix();
       dir1.position.set(built.radius * -1.2, built.radius * 1.6, built.radius * 1.4);
 
-      // Ortografik (paralel izdüşüm) kamera: uzun parçalarda perspektif
-      // nedeniyle yakın uç büyük, uzak uç küçük GÖRÜNMEZ — her iki köşe de
-      // ekranda aynı boyutta olur (yakınlaştırmakla değişmeyen gerçek çözüm).
-      const viewHalf = built.crossSpan * 1.9;
-      camera.left = -viewHalf * aspect;
-      camera.right = viewHalf * aspect;
-      camera.top = viewHalf;
-      camera.bottom = -viewHalf;
+      // Gercek perspektif kamera: yakin uc buyuk, uzak uc kucuk gorunur (dogal 3D bakis).
       camera.near = 0.1;
       camera.far = (built.crossSpan + built.depthSize) * 20;
 
-      const camDist = (built.crossSpan + built.depthSize) * 1.2;
-      camera.position.set(camDist * -0.9, camDist * 0.85, camDist * 0.85);
-      camera.zoom = 1;
+      const camDist = (built.crossSpan + built.depthSize) * 1.3;
+      // SIMETRI: mesh (0,0,0)'a ortalanmis, uzunluk (extrusion derinligi) Z ekseni
+      // boyunca uzaniyor. Kamera Z=0 duzleminde tutularak parcanin iki ucu
+      // kameraya TAM ESIT uzaklikta kalir (matematiksel olarak simetrik gorunum).
+      // Acili 3D his sadece X/Y'den geliyor, Z'den degil.
+      camera.position.set(camDist * -1.25, camDist * 0.95, 0);
       camera.updateProjectionMatrix();
     }
 
@@ -189,8 +185,10 @@ function ThreeDCanvas({ points, thickness, depth }) {
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
     controls.rotateSpeed = 0.9;
-    controls.minZoom = 0.35;
-    controls.maxZoom = 8;
+    if (built) {
+      controls.minDistance = camera.position.length() * 0.2;
+      controls.maxDistance = camera.position.length() * 4;
+    }
 
     let frameId;
     const animate = () => {
