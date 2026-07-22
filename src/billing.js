@@ -59,6 +59,18 @@ async function getProPackage() {
   return pkg;
 }
 
+// Play Console'da tanimli GERCEK fiyati (localized, ornek "€4,99") dondurur.
+// Boylece fiyat degistiginde koda dokunmaya gerek kalmaz.
+export async function getProPriceString() {
+  if (!initialized) return null;
+  try {
+    const pkg = await getProPackage();
+    return pkg?.product?.priceString || null;
+  } catch (e) {
+    return null;
+  }
+}
+
 // Donen deger: { ok: true, active: boolean } veya { ok: false, cancelled: boolean, message: string }
 export async function purchasePro() {
   if (!initialized) {
@@ -93,7 +105,7 @@ KURULUM ADIMLARI (kod disinda, sen yapman gereken islemler):
 
 1) Google Play Console'da uygulama icinde "Uretilen Urunler" (Monetize > Products > In-app products)
    bolumune git, non-consumable (managed product) bir urun olustur.
-   Onerilen Product ID: obp_pro_lifetime  (fiyat: 9.99 EUR)
+   Onerilen Product ID: obp_pro_lifetime  (fiyat: 4.99 EUR)
 
 2) RevenueCat'e (revenuecat.com) ucretsiz hesap ac, yeni proje olustur.
    Project Settings > Integrations > Google Play Store'dan Play Console servis hesabi

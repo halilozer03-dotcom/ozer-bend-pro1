@@ -7,20 +7,20 @@ import WeightCalc from "./weightcalc";
 import logoUrl from "./assets/logo.jpg";
 import FullscreenViewer from "./viewer3d";
 import { canUse3D, getCompanyLogo, setCompanyLogo, isProUser, trialDaysLeft } from "./license.js";
-import { initBilling, purchasePro, restorePurchases } from "./billing.js";
+import { initBilling, purchasePro, restorePurchases, getProPriceString } from "./billing.js";
 
 const SETTINGS_TXT = {
-  tr: { companyName: "Firma Adı (PDF başlığında görünür)", logoLabel: "Firma Logosu (PDF sol üst köşede görünür)", logoRemove: "Logoyu Kaldır", proActive: "PRO aktif — tüm özellikler açık", buyPro: "PRO'ya Geç — €9,99", buying: "İşleniyor…", restore: "Satın Almaları Geri Yükle", trialLeft: (n) => "Deneme sürümü: " + n + " gün kaldı", trialOver: "Deneme sona erdi — günde 3 PDF; logo ve 3D kilitli" },
-  en: { companyName: "Company Name (shown in PDF header)", logoLabel: "Company Logo (shown at top-left of PDF)", logoRemove: "Remove Logo", proActive: "PRO active — all features unlocked", buyPro: "Upgrade to PRO — €9.99", buying: "Processing…", restore: "Restore Purchases", trialLeft: (n) => "Trial: " + n + " day(s) left", trialOver: "Trial ended — 3 PDFs/day; logo & 3D locked" },
-  fr: { companyName: "Nom de l'entreprise (visible dans l'en-tête du PDF)", logoLabel: "Logo de l'entreprise (en haut à gauche du PDF)", logoRemove: "Supprimer le logo", proActive: "PRO actif — toutes les fonctionnalités débloquées", buyPro: "Passer à PRO — 9,99 €", buying: "Traitement…", restore: "Restaurer les achats", trialLeft: (n) => "Essai : " + n + " jour(s) restant(s)", trialOver: "Essai terminé — 3 PDF/jour ; logo et 3D verrouillés" },
-  de: { companyName: "Firmenname (erscheint in der PDF-Kopfzeile)", logoLabel: "Firmenlogo (oben links im PDF)", logoRemove: "Logo entfernen", proActive: "PRO aktiv — alle Funktionen freigeschaltet", buyPro: "Auf PRO upgraden — 9,99 €", buying: "Wird verarbeitet…", restore: "Käufe wiederherstellen", trialLeft: (n) => "Testversion: noch " + n + " Tag(e)", trialOver: "Test abgelaufen — 3 PDFs/Tag; Logo & 3D gesperrt" },
-  es: { companyName: "Nombre de la empresa (visible en el encabezado del PDF)", logoLabel: "Logotipo de la empresa (arriba a la izquierda del PDF)", logoRemove: "Quitar logotipo", proActive: "PRO activo — todas las funciones desbloqueadas", buyPro: "Mejorar a PRO — 9,99 €", buying: "Procesando…", restore: "Restaurar compras", trialLeft: (n) => "Prueba: quedan " + n + " día(s)", trialOver: "Prueba finalizada — 3 PDF/día; logo y 3D bloqueados" },
-  it: { companyName: "Nome azienda (visibile nell'intestazione del PDF)", logoLabel: "Logo aziendale (in alto a sinistra nel PDF)", logoRemove: "Rimuovi logo", proActive: "PRO attivo — tutte le funzioni sbloccate", buyPro: "Passa a PRO — 9,99 €", buying: "Elaborazione…", restore: "Ripristina acquisti", trialLeft: (n) => "Prova: " + n + " giorno/i rimasti", trialOver: "Prova terminata — 3 PDF/giorno; logo e 3D bloccati" },
-  ru: { companyName: "Название компании (отображается в заголовке PDF)", logoLabel: "Логотип компании (вверху слева в PDF)", logoRemove: "Удалить логотип", proActive: "PRO активен — все функции доступны", buyPro: "Перейти на PRO — €9,99", buying: "Обработка…", restore: "Восстановить покупки", trialLeft: (n) => "Пробный период: осталось " + n + " дн.", trialOver: "Пробный период истёк — 3 PDF/день; логотип и 3D заблокированы" },
-  pt: { companyName: "Nome da empresa (exibido no cabeçalho do PDF)", logoLabel: "Logotipo da empresa (no canto superior esquerdo do PDF)", logoRemove: "Remover logotipo", proActive: "PRO ativo — todos os recursos desbloqueados", buyPro: "Atualizar para PRO — €9,99", buying: "Processando…", restore: "Restaurar compras", trialLeft: (n) => "Teste: restam " + n + " dia(s)", trialOver: "Teste encerrado — 3 PDFs/dia; logo e 3D bloqueados" },
-  pl: { companyName: "Nazwa firmy (widoczna w nagłówku PDF)", logoLabel: "Logo firmy (w lewym górnym rogu PDF)", logoRemove: "Usuń logo", proActive: "PRO aktywny — wszystkie funkcje odblokowane", buyPro: "Przejdź na PRO — 9,99 €", buying: "Przetwarzanie…", restore: "Przywróć zakupy", trialLeft: (n) => "Wersja próbna: pozostało " + n + " dni", trialOver: "Okres próbny zakończony — 3 PDF/dzień; logo i 3D zablokowane" },
-  zh: { companyName: "公司名称（显示在PDF标题中）", logoLabel: "公司标志（显示在PDF左上角）", logoRemove: "移除标志", proActive: "PRO已激活 — 所有功能已解锁", buyPro: "升级到PRO — €9.99", buying: "处理中…", restore: "恢复购买", trialLeft: (n) => "试用期：剩余" + n + "天", trialOver: "试用已结束 — 每天3个PDF；标志和3D已锁定" },
-  ar: { companyName: "اسم الشركة (يظهر في ترويسة PDF)", logoLabel: "شعار الشركة (أعلى يسار PDF)", logoRemove: "إزالة الشعار", proActive: "PRO مفعّل — جميع الميزات متاحة", buyPro: "الترقية إلى PRO — 9.99 يورو", buying: "جارٍ المعالجة…", restore: "استعادة المشتريات", trialLeft: (n) => "الفترة التجريبية: تبقى " + n + " يوم", trialOver: "انتهت الفترة التجريبية — 3 PDF يوميًا؛ الشعار وثلاثي الأبعاد مقفلان" }
+  tr: { companyName: "Firma Adı (PDF başlığında görünür)", logoLabel: "Firma Logosu (PDF sol üst köşede görünür)", logoRemove: "Logoyu Kaldır", proActive: "PRO aktif — tüm özellikler açık", buyPro: "PRO'ya Geç —", buying: "İşleniyor…", restore: "Satın Almaları Geri Yükle", trialLeft: (n) => "Deneme sürümü: " + n + " gün kaldı", trialOver: "Deneme sona erdi — günde 3 PDF; logo ve 3D kilitli" },
+  en: { companyName: "Company Name (shown in PDF header)", logoLabel: "Company Logo (shown at top-left of PDF)", logoRemove: "Remove Logo", proActive: "PRO active — all features unlocked", buyPro: "Upgrade to PRO —", buying: "Processing…", restore: "Restore Purchases", trialLeft: (n) => "Trial: " + n + " day(s) left", trialOver: "Trial ended — 3 PDFs/day; logo & 3D locked" },
+  fr: { companyName: "Nom de l'entreprise (visible dans l'en-tête du PDF)", logoLabel: "Logo de l'entreprise (en haut à gauche du PDF)", logoRemove: "Supprimer le logo", proActive: "PRO actif — toutes les fonctionnalités débloquées", buyPro: "Passer à PRO —", buying: "Traitement…", restore: "Restaurer les achats", trialLeft: (n) => "Essai : " + n + " jour(s) restant(s)", trialOver: "Essai terminé — 3 PDF/jour ; logo et 3D verrouillés" },
+  de: { companyName: "Firmenname (erscheint in der PDF-Kopfzeile)", logoLabel: "Firmenlogo (oben links im PDF)", logoRemove: "Logo entfernen", proActive: "PRO aktiv — alle Funktionen freigeschaltet", buyPro: "Auf PRO upgraden —", buying: "Wird verarbeitet…", restore: "Käufe wiederherstellen", trialLeft: (n) => "Testversion: noch " + n + " Tag(e)", trialOver: "Test abgelaufen — 3 PDFs/Tag; Logo & 3D gesperrt" },
+  es: { companyName: "Nombre de la empresa (visible en el encabezado del PDF)", logoLabel: "Logotipo de la empresa (arriba a la izquierda del PDF)", logoRemove: "Quitar logotipo", proActive: "PRO activo — todas las funciones desbloqueadas", buyPro: "Mejorar a PRO —", buying: "Procesando…", restore: "Restaurar compras", trialLeft: (n) => "Prueba: quedan " + n + " día(s)", trialOver: "Prueba finalizada — 3 PDF/día; logo y 3D bloqueados" },
+  it: { companyName: "Nome azienda (visibile nell'intestazione del PDF)", logoLabel: "Logo aziendale (in alto a sinistra nel PDF)", logoRemove: "Rimuovi logo", proActive: "PRO attivo — tutte le funzioni sbloccate", buyPro: "Passa a PRO —", buying: "Elaborazione…", restore: "Ripristina acquisti", trialLeft: (n) => "Prova: " + n + " giorno/i rimasti", trialOver: "Prova terminata — 3 PDF/giorno; logo e 3D bloccati" },
+  ru: { companyName: "Название компании (отображается в заголовке PDF)", logoLabel: "Логотип компании (вверху слева в PDF)", logoRemove: "Удалить логотип", proActive: "PRO активен — все функции доступны", buyPro: "Перейти на PRO —", buying: "Обработка…", restore: "Восстановить покупки", trialLeft: (n) => "Пробный период: осталось " + n + " дн.", trialOver: "Пробный период истёк — 3 PDF/день; логотип и 3D заблокированы" },
+  pt: { companyName: "Nome da empresa (exibido no cabeçalho do PDF)", logoLabel: "Logotipo da empresa (no canto superior esquerdo do PDF)", logoRemove: "Remover logotipo", proActive: "PRO ativo — todos os recursos desbloqueados", buyPro: "Atualizar para PRO —", buying: "Processando…", restore: "Restaurar compras", trialLeft: (n) => "Teste: restam " + n + " dia(s)", trialOver: "Teste encerrado — 3 PDFs/dia; logo e 3D bloqueados" },
+  pl: { companyName: "Nazwa firmy (widoczna w nagłówku PDF)", logoLabel: "Logo firmy (w lewym górnym rogu PDF)", logoRemove: "Usuń logo", proActive: "PRO aktywny — wszystkie funkcje odblokowane", buyPro: "Przejdź na PRO —", buying: "Przetwarzanie…", restore: "Przywróć zakupy", trialLeft: (n) => "Wersja próbna: pozostało " + n + " dni", trialOver: "Okres próbny zakończony — 3 PDF/dzień; logo i 3D zablokowane" },
+  zh: { companyName: "公司名称（显示在PDF标题中）", logoLabel: "公司标志（显示在PDF左上角）", logoRemove: "移除标志", proActive: "PRO已激活 — 所有功能已解锁", buyPro: "升级到PRO —", buying: "处理中…", restore: "恢复购买", trialLeft: (n) => "试用期：剩余" + n + "天", trialOver: "试用已结束 — 每天3个PDF；标志和3D已锁定" },
+  ar: { companyName: "اسم الشركة (يظهر في ترويسة PDF)", logoLabel: "شعار الشركة (أعلى يسار PDF)", logoRemove: "إزالة الشعار", proActive: "PRO مفعّل — جميع الميزات متاحة", buyPro: "الترقية إلى PRO —", buying: "جارٍ المعالجة…", restore: "استعادة المشتريات", trialLeft: (n) => "الفترة التجريبية: تبقى " + n + " يوم", trialOver: "انتهت الفترة التجريبية — 3 PDF يوميًا؛ الشعار وثلاثي الأبعاد مقفلان" }
 };
 const stx = (l) => SETTINGS_TXT[l] || SETTINGS_TXT.en;
 
@@ -922,11 +922,15 @@ function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [companyLogo, setCompanyLogoState] = useState(() => getCompanyLogo());
   const [proActive, setProActive] = useState(() => isProUser());
+  const [proPriceLabel, setProPriceLabel] = useState(null);
   const [purchaseBusy, setPurchaseBusy] = useState(false);
   const [purchaseMsg, setPurchaseMsg] = useState(null);
 
   useEffect(() => {
-    initBilling().then(() => setProActive(isProUser()));
+    initBilling().then(() => {
+      setProActive(isProUser());
+      getProPriceString().then((price) => { if (price) setProPriceLabel(price); });
+    });
   }, []);
 
   const handleBuyPro = async () => {
@@ -1604,7 +1608,7 @@ function App() {
               onClick={handleBuyPro}
               style={{ background: "#c9a227", color: "#17130f", fontWeight: 700, border: "none", borderRadius: 6, padding: "8px 14px", cursor: purchaseBusy ? "wait" : "pointer" }}
             >
-              {purchaseBusy ? stx(lang).buying : stx(lang).buyPro}
+              {purchaseBusy ? stx(lang).buying : `${stx(lang).buyPro} ${proPriceLabel || "€4,99"}`}
             </button>
             <button
               type="button"
@@ -1836,7 +1840,7 @@ function App() {
           <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.9)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 24, textAlign: "center" }}>
             <div style={{ fontSize: 42 }}>🔒</div>
             <div style={{ color: "#fff", fontSize: 17, fontWeight: 700 }}>3D önizleme PRO özelliğidir / 3D preview is a PRO feature</div>
-            <div style={{ color: "#bbb", fontSize: 13, maxWidth: 420 }}>7 günlük deneme süreniz doldu. Sınırsız PDF, logo ve 3D için PRO (9.99€, tek seferlik).</div>
+            <div style={{ color: "#bbb", fontSize: 13, maxWidth: 420 }}>7 günlük deneme süreniz doldu. Sınırsız PDF, logo ve 3D için PRO (4.99€, tek seferlik).</div>
             <button type="button" onClick={() => setShowFullscreen(false)} style={{ marginTop: 8, padding: "10px 22px", borderRadius: 8, border: "1px solid #c9a227", background: "#c9a227", color: "#000", fontWeight: 700 }}>Kapat / Close</button>
           </div>
         )}
