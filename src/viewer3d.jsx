@@ -133,10 +133,10 @@ function ThreeDCanvas({ points, thickness, depth }) {
     const hemi = new THREE.HemisphereLight(0xffffff, 0x3a3f4a, 0.6);
     scene.add(hemi);
     const dir1 = new THREE.DirectionalLight(0xffffff, 1.15);
-    dir1.position.set(1, 1.4, 1.2);
+    dir1.position.set(-1, 1.4, 1.2);
     scene.add(dir1);
     const dir2 = new THREE.DirectionalLight(0xffe9b0, 0.55);
-    dir2.position.set(-1, -0.6, -1);
+    dir2.position.set(1, -0.6, -1);
     scene.add(dir2);
 
     const built = buildExtrudedMesh(points, thickness, depth);
@@ -166,7 +166,7 @@ function ThreeDCanvas({ points, thickness, depth }) {
       dir1.shadow.camera.top = built.radius * 2;
       dir1.shadow.camera.bottom = -built.radius * 2;
       dir1.shadow.camera.updateProjectionMatrix();
-      dir1.position.set(built.radius * 1.2, built.radius * 1.6, built.radius * 1.4);
+      dir1.position.set(built.radius * -1.2, built.radius * 1.6, built.radius * 1.4);
 
       // Ortografik (paralel izdüşüm) kamera: uzun parçalarda perspektif
       // nedeniyle yakın uç büyük, uzak uç küçük GÖRÜNMEZ — her iki köşe de
@@ -180,7 +180,7 @@ function ThreeDCanvas({ points, thickness, depth }) {
       camera.far = (built.crossSpan + built.depthSize) * 20;
 
       const camDist = (built.crossSpan + built.depthSize) * 1.2;
-      camera.position.set(camDist * 0.85, camDist * 0.65, camDist * 0.55);
+      camera.position.set(camDist * -1.0, camDist * 0.7, camDist * 0.6);
       camera.zoom = 1;
       camera.updateProjectionMatrix();
     }

@@ -149,7 +149,7 @@ input:focus,select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 
 .threeMount{position:absolute;inset:0}
 .threeMount canvas{display:block;touch-action:none}
 .fsHint{
-  position:absolute;bottom:14px;left:0;right:0;text-align:center;
+  position:absolute;bottom:calc(14px + env(safe-area-inset-bottom));left:0;right:0;text-align:center;
   color:rgba(255,255,255,.55);font-size:12.5px;pointer-events:none;
 }
 .profile{fill:none;stroke:#f2f2f2;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 4px rgba(255,255,255,.18))}

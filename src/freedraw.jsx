@@ -377,7 +377,7 @@ export default function FreeDrawCanvas({ maxSegments, onCommit, onClose, lang })
       </Stage>
 
       <div style={{
-        position: "absolute", top: 10, left: 10, zIndex: 3,
+        position: "absolute", top: "calc(10px + env(safe-area-inset-top))", left: 10, zIndex: 3,
         background: "rgba(5,7,10,0.75)", color: "#e8ecef", fontWeight: 700, fontSize: 13,
         padding: "6px 12px", borderRadius: 999, border: "1px solid rgba(255,255,255,0.15)",
         pointerEvents: "none"
@@ -388,7 +388,7 @@ export default function FreeDrawCanvas({ maxSegments, onCommit, onClose, lang })
       <button
         onClick={onClose}
         style={{
-          position: "absolute", top: 6, right: 6, zIndex: 3,
+          position: "absolute", top: "calc(6px + env(safe-area-inset-top))", right: 6, zIndex: 3,
           width: 40, height: 40, borderRadius: 20, border: "1px solid rgba(255,255,255,0.15)",
           background: "rgba(5,7,10,0.75)", color: "#e8ecef", fontSize: 18
         }}

@@ -65,7 +65,7 @@ export default function WeightCalc({ onClose }) {
     <div style={{ position: "fixed", inset: 0, background: "#05070a", zIndex: 999, overflowY: "auto" }}>
       <div style={{
         position: "sticky", top: 0, display: "flex", justifyContent: "space-between", alignItems: "center",
-        padding: "16px 20px", background: "#05070a", borderBottom: "1px solid rgba(255,255,255,0.08)", zIndex: 2
+        padding: "calc(16px + env(safe-area-inset-top)) 20px 16px", background: "#05070a", borderBottom: "1px solid rgba(255,255,255,0.08)", zIndex: 2
       }}>
         <span style={{ color: "#e8ecef", fontWeight: 800, fontSize: 20 }}>Ağırlık Hesapla</span>
         <button onClick={onClose} style={{ background: "none", border: "none", color: "#e8ecef", fontSize: 24 }}>✕</button>
