@@ -33,7 +33,7 @@ const btnStyle = (extra) => ({
 });
 
 const FD_DICT = {
-  tr: { title: "Serbest Çizim", draw: "Çiz", edit: "Düzenle", drawMode: "Çiz Modu", editMode: "Düzenle Modu", zoomOut: "Uzaklaştır", zoomIn: "Yakınlaştır", angleOn: "15° Açı: Açık", angleOff: "15° Açı: Kapalı", undo: "Geri Al", reset: "Sıfırla", apply: "Uygula", hint: "{T.hint}" },
+  tr: { title: "Serbest Çizim", draw: "Çiz", edit: "Düzenle", drawMode: "Çiz Modu", editMode: "Düzenle Modu", zoomOut: "Uzaklaştır", zoomIn: "Yakınlaştır", angleOn: "15° Açı: Açık", angleOff: "15° Açı: Kapalı", undo: "Geri Al", reset: "Sıfırla", apply: "Uygula", hint: "Ekrana dokunup sürükleyerek ilk çizgiyi çiz. İki parmakla yakınlaştır/uzaklaştır." },
   en: { title: "Free Draw", draw: "Draw", edit: "Edit", drawMode: "Draw Mode", editMode: "Edit Mode", zoomOut: "Zoom Out", zoomIn: "Zoom In", angleOn: "15° Angle: On", angleOff: "15° Angle: Off", undo: "Undo", reset: "Reset", apply: "Apply", hint: "Touch and drag to draw the first line. Pinch with two fingers to zoom." },
   fr: { title: "Dessin libre", draw: "Dessiner", edit: "Modifier", drawMode: "Mode dessin", editMode: "Mode édition", zoomOut: "Réduire", zoomIn: "Agrandir", angleOn: "Angle 15° : Activé", angleOff: "Angle 15° : Désactivé", undo: "Annuler", reset: "Réinitialiser", apply: "Appliquer", hint: "Touchez et faites glisser pour tracer la première ligne. Pincez avec deux doigts pour zoomer." },
   de: { title: "Freies Zeichnen", draw: "Zeichnen", edit: "Bearbeiten", drawMode: "Zeichenmodus", editMode: "Bearbeitungsmodus", zoomOut: "Verkleinern", zoomIn: "Vergrößern", angleOn: "15°-Winkel: Ein", angleOff: "15°-Winkel: Aus", undo: "Rückgängig", reset: "Zurücksetzen", apply: "Anwenden", hint: "Zum Zeichnen der ersten Linie tippen und ziehen. Mit zwei Fingern zoomen." },
@@ -396,7 +396,7 @@ export default function FreeDrawCanvas({ maxSegments, onCommit, onClose, lang })
 
       {points.length === 0 && (
         <div style={{ position: "absolute", top: 56, left: 0, right: 0, textAlign: "center", color: "#9aa3ab", fontSize: 14, padding: "0 20px", zIndex: 2, pointerEvents: "none" }}>
-          Ekrana dokunup sürükleyerek ilk çizgiyi çiz. İki parmakla yakınlaştır/uzaklaştır.
+          {T.hint}
         </div>
       )}
 

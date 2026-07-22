@@ -125,7 +125,7 @@ input:focus,select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 
 }
 .fsTopBar{
   display:flex;align-items:center;justify-content:space-between;
-  padding:14px 16px;background:#0d1118;border-bottom:1px solid rgba(255,255,255,.08);
+  padding:calc(14px + env(safe-area-inset-top)) 16px 14px;background:#0d1118;border-bottom:1px solid rgba(255,255,255,.08);
 }
 .fsTabs{display:flex;gap:8px}
 .fsRightBtns{display:flex;gap:8px}

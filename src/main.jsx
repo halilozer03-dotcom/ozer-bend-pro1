@@ -1546,31 +1546,6 @@ function App() {
                   ? stx(lang).trialLeft(trialDaysLeft())
                   : stx(lang).trialOver)}
             </p>
-            {!proActive && (
-              <div style={{ gridColumn: "1 / -1", display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", marginBottom: 6 }}>
-                <button
-                  type="button"
-                  disabled={purchaseBusy}
-                  onClick={handleBuyPro}
-                  style={{ background: "#c9a227", color: "#17130f", fontWeight: 700, border: "none", borderRadius: 6, padding: "9px 16px", cursor: purchaseBusy ? "wait" : "pointer" }}
-                >
-                  {purchaseBusy ? stx(lang).buying : stx(lang).buyPro}
-                </button>
-                <button
-                  type="button"
-                  disabled={purchaseBusy}
-                  onClick={handleRestorePurchases}
-                  style={{ background: "transparent", color: "#c9a227", border: "1px solid #c9a227", borderRadius: 6, padding: "8px 14px", cursor: purchaseBusy ? "wait" : "pointer" }}
-                >
-                  {stx(lang).restore}
-                </button>
-              </div>
-            )}
-            {purchaseMsg && (
-              <p style={{ gridColumn: "1 / -1", fontSize: 12, color: purchaseMsg.ok ? "#4caf50" : "#e05555", margin: "0 0 4px" }}>
-                {purchaseMsg.text}
-              </p>
-            )}
             <p style={{ fontSize: 11.5, color: "#8b929b", lineHeight: 1.6, gridColumn: "1 / -1", marginTop: 4 }}>
               © {new Date().getFullYear()} ÖZER BEND PRO. All rights reserved. DURMA, Hardox and other
               product/brand names mentioned in this app are trademarks of their respective owners.
@@ -1613,6 +1588,37 @@ function App() {
             <div className="grid oneLine">
               {input(t.manualBdInputLabel, manualBdValue, setManualBdValue)}
             </div>
+          )}
+        </section>
+      )}
+
+      {!proActive && (
+        <section className="panel" style={{ padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", background: "linear-gradient(135deg,#1f1a12,#17130f)", border: "1px solid #c9a227" }}>
+          <span style={{ fontSize: 12.5, color: "#c9a227", fontWeight: 600 }}>
+            {trialDaysLeft() > 0 ? stx(lang).trialLeft(trialDaysLeft()) : stx(lang).trialOver}
+          </span>
+          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+            <button
+              type="button"
+              disabled={purchaseBusy}
+              onClick={handleBuyPro}
+              style={{ background: "#c9a227", color: "#17130f", fontWeight: 700, border: "none", borderRadius: 6, padding: "8px 14px", cursor: purchaseBusy ? "wait" : "pointer" }}
+            >
+              {purchaseBusy ? stx(lang).buying : stx(lang).buyPro}
+            </button>
+            <button
+              type="button"
+              disabled={purchaseBusy}
+              onClick={handleRestorePurchases}
+              style={{ background: "transparent", color: "#c9a227", border: "1px solid #c9a227", borderRadius: 6, padding: "7px 12px", fontSize: 12.5, cursor: purchaseBusy ? "wait" : "pointer" }}
+            >
+              {stx(lang).restore}
+            </button>
+          </div>
+          {purchaseMsg && (
+            <span style={{ width: "100%", fontSize: 12, color: purchaseMsg.ok ? "#4caf50" : "#e05555" }}>
+              {purchaseMsg.text}
+            </span>
           )}
         </section>
       )}
