@@ -180,7 +180,7 @@ function ThreeDCanvas({ points, thickness, depth }) {
       camera.far = (built.crossSpan + built.depthSize) * 20;
 
       const camDist = (built.crossSpan + built.depthSize) * 1.2;
-      camera.position.set(camDist * -1.0, camDist * 0.7, camDist * 0.6);
+      camera.position.set(camDist * -0.9, camDist * 0.85, camDist * 0.85);
       camera.zoom = 1;
       camera.updateProjectionMatrix();
     }
