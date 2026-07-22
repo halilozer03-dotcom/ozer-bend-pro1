@@ -9,7 +9,7 @@ import FullscreenViewer from "./viewer3d";
 import { canUse3D, getCompanyLogo, setCompanyLogo, isProUser, trialDaysLeft } from "./license.js";
 
 const SETTINGS_TXT = {
-  tr: { companyName: "Firma Adı (PDF başlığında görünür)", logoLabel: "Firma Logosu (PDF sol üst köşede görünür)", logoRemove: "Logoyu Kaldır", proActive: stx(lang).proActive, trialLeft: (n) => "Deneme sürümü: " + n + " gün kaldı", trialOver: stx(lang).trialOver },
+  tr: { companyName: "Firma Adı (PDF başlığında görünür)", logoLabel: "Firma Logosu (PDF sol üst köşede görünür)", logoRemove: "Logoyu Kaldır", proActive: "PRO aktif — tüm özellikler açık", trialLeft: (n) => "Deneme sürümü: " + n + " gün kaldı", trialOver: "Deneme sona erdi — günde 3 PDF; logo ve 3D kilitli" },
   en: { companyName: "Company Name (shown in PDF header)", logoLabel: "Company Logo (shown at top-left of PDF)", logoRemove: "Remove Logo", proActive: "PRO active — all features unlocked", trialLeft: (n) => "Trial: " + n + " day(s) left", trialOver: "Trial ended — 3 PDFs/day; logo & 3D locked" },
   fr: { companyName: "Nom de l'entreprise (visible dans l'en-tête du PDF)", logoLabel: "Logo de l'entreprise (en haut à gauche du PDF)", logoRemove: "Supprimer le logo", proActive: "PRO actif — toutes les fonctionnalités débloquées", trialLeft: (n) => "Essai : " + n + " jour(s) restant(s)", trialOver: "Essai terminé — 3 PDF/jour ; logo et 3D verrouillés" },
   de: { companyName: "Firmenname (erscheint in der PDF-Kopfzeile)", logoLabel: "Firmenlogo (oben links im PDF)", logoRemove: "Logo entfernen", proActive: "PRO aktiv — alle Funktionen freigeschaltet", trialLeft: (n) => "Testversion: noch " + n + " Tag(e)", trialOver: "Test abgelaufen — 3 PDFs/Tag; Logo & 3D gesperrt" },
