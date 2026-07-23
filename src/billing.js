@@ -5,7 +5,7 @@ import { activatePro } from "./license.js";
 
 // RevenueCat Dashboard > Project Settings > API Keys > Public app-specific API key (Android/Google Play)
 // BURAYA KENDI ANAHTARINI YAPISTIR:
-const REVENUECAT_ANDROID_API_KEY = "REPLACE_WITH_REVENUECAT_PUBLIC_ANDROID_KEY";
+const REVENUECAT_ANDROID_API_KEY = "goog_uKtuMBeShNAnAinpykSsCmNiXct";
 
 // RevenueCat Dashboard > Entitlements bolumunde olusturdugun entitlement id'si
 const ENTITLEMENT_ID = "pro";
